@@ -82,6 +82,15 @@ h2{font:400 30px var(--serif);margin:36px 0 6px}
 .search{width:100%;padding:14px 22px;border-radius:30px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;margin:0 0 14px}
 .search:focus{outline:none;border-color:var(--ink)}
 .ghost:disabled{opacity:.5;cursor:default}
+.reader{display:grid;grid-template-columns:1fr 270px;gap:26px;align-items:start}
+@media(max-width:760px){.reader{grid-template-columns:1fr}}
+.rtext{font:400 21px/1.9 var(--serif)}.rtext.zh{font-family:var(--hz);font-size:23px}
+mark{background:none;color:var(--ink);border-bottom:2px solid var(--ink);cursor:pointer;padding:0 1px;transition:background .3s,color .3s}
+mark:hover{background:var(--ink);color:var(--bg)}
+.chat{border:1px solid var(--line);border-radius:22px;padding:14px;font-size:14px}
+.cl{max-height:250px;overflow:auto;margin:8px 0}.cl p{margin:6px 0}
+#pop{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(300px,calc(100vw - 32px));background:var(--bg);border:1px solid var(--ink);border-radius:22px;padding:16px 18px;z-index:5}
+#pop p{margin:6px 0 10px}
 .link{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font:inherit;font-size:14px;margin-top:26px;padding:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -101,7 +110,7 @@ const LV=[
 ["hsk6","HSK 6","5,000 words · advanced","六","弊端|bì duān|drawback;干预|gān yù|to intervene;渺小|miǎo xiǎo|tiny;迫不及待|pò bù jí dài|cannot wait;顽强|wán qiáng|tenacious;诚恳|chéng kěn|sincere;慷慨|kāng kǎi|generous;欣慰|xīn wèi|gratified;愧疚|kuì jiù|guilty;轻而易举|qīng ér yì jǔ|effortless;刻不容缓|kè bù róng huǎn|extremely urgent;根深蒂固|gēn shēn dì gù|deep-rooted"],
 ["hsk79","HSK 7–9","one combined advanced exam","高","阐述|chǎn shù|to elaborate;凝聚|níng jù|to rally;渗透|shèn tòu|to permeate;悖论|bèi lùn|paradox;范畴|fàn chóu|category;蕴含|yùn hán|to contain;颠覆|diān fù|to overturn;辩证|biàn zhèng|dialectical;潜移默化|qián yí mò huà|subtle influence;一丝不苟|yì sī bù gǒu|meticulous;脱颖而出|tuō yǐng ér chū|to stand out;意味深长|yì wèi shēn cháng|meaningful"]
 ].map(([id,name,sub,g,s])=>({id,name,sub,g,w:s.split(";").map(x=>{const[zh,py,en]=x.split("|");return{zh,py,en,lvl:name}})}));
-const MENU=[["tests","测试","Tests","Exams, practice tests and adaptive review"],["vocab","词汇","Vocab","Every HSK word, searchable"],["textbooks","课本","Textbooks",""],["reading","阅读","Reading",""],["flashcards","卡片","Flashcards",""],["wordlist","词表","Wordlist",""]];
+const MENU=[["tests","测试","Tests","Exams, practice tests and adaptive review"],["vocab","词汇","Vocab","Every HSK word, searchable"],["learning","学习","Learning","Path and textbooks"],["reading","阅读","Reading","Study vocabulary in real text"],["flashcards","卡片","Flashcards",""],["wordlist","词表","Wordlist",""]];
 /* ---------- word data: loaded in full from the open-source repo, shown in our own UI ---------- */
 const DB={},PR={},FB={};
 const SRC=["https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/","https://cdn.jsdelivr.net/gh/drkameleon/complete-hsk-vocabulary@main/"];
@@ -146,12 +155,12 @@ function pickCard(){const n=Date.now(),all=Object.values(deck);
 /* ---------- views ---------- */
 const page=(h,sub,body,back)=>`<div class="page">${back?`<a class="back" href="#/${back[0]}" style="--i:0">${back[1]}</a>`:""}<h1 style="--i:1">${h}</h1>${sub?`<p class="lead" style="--i:2">${sub}</p>`:""}<div class="body">${body}</div></div>`;
 const row=(h,t,d,g,i,cls="")=>`<a class="row ${cls}" href="#/${h}" style="--i:${i}"><span><b>${t}</b><small>${d}</small></span><span class="g" lang="zh">${g}</span></a>`;
-const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2]+(i>1?'<span class="tag">soon</span>':""),m[3],m[1],i+3,"big")).join(""));
+const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2]+(i>3?'<span class="tag">soon</span>':""),m[3],m[1],i+3,"big")).join(""));
 const soon=a=>{const m=MENU.find(x=>x[0]===a);return m?page(m[2],"This section is next on the list.","",["","Menu"]):home()};
 const testsHub=()=>{const n=Date.now(),d=Object.values(deck).filter(c=>c.due<=n).length;
- return page("Tests","Check where you stand, take longer practice sets, and drill what you keep missing.",
+ return page("Tests","Check where you stand, sit full-length exams, take longer practice sets, and drill what you keep missing.",
  row("tests/exams","Exams","One section for each level, HSK 1 to 9","考",3)+row("tests/practice","Practice tests","Longer sets drawn from the full word lists","练",4)+row("tests/adaptive","Adaptive",d?d+" due now":"Spaced review of the words you struggle with","适",5),["","Menu"])};
-const examList=()=>page("Exams","Ten questions per level, drawn from the complete HSK word list. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/exam/"+l.id,l.name,l.sub+" · 10 questions",l.g,i+3)).join(""),["tests","Tests"]);
+const examList=()=>page("Exams","Full-length, timed exams in the HSK section layout. Questions rotate every 2 days (next in "+fmt((Math.floor(Date.now()/EP)+1)*EP-Date.now())+").",LV.map((l,i)=>row("tests/exam/"+l.id,l.name,SP[l.id].map(x=>x[0]+" "+x[1]).join(" + ")+", "+SP[l.id].reduce((a,x)=>a+x[2],0)+" min",l.g,i+3)).join("")+`<button class="main alt" data-a="shufall" style="margin-top:26px">Shuffle all exams now</button><p class="note" style="margin-top:20px">Questions are generated from the full HSK word lists using the official section structure. Official past papers are copyrighted and are not reproduced here.</p>`,["tests","Tests"]);
 const credit='<p class="note" style="margin-top:34px">Word data: Complete HSK Vocabulary (MIT licence). Definitions: CC-CEDICT (CC BY-SA 4.0).</p>';
 const loading=(h,b)=>page(h,"Loading the word list…","",b);
 const practiceList=()=>page("Practice tests","Thirty questions per set, drawn from the complete word list for each level. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/practice/"+l.id,l.name,l.sub+" · 30 questions",l.g,i+3)).join("")+credit,["tests","Tests"]);
@@ -166,7 +175,7 @@ function listView(lv){vlv=lv;if(!ensure(lv))return loading(lv.name,["vocab/lists
 /* exams */
 let ex=null;
 const lab=(w,t)=>t===0?w.en:t===1?w.zh:w.py;
-function mkOpts(w,t,pool){const seen=new Set([lab(w,t)]),o=[w];for(const x of shuf(pool)){const k=lab(x,t);if(!seen.has(k)){seen.add(k);o.push(x);if(o.length===4)break}}return shuf(o)}
+function mkOpts(w,t,pool,r){const seen=new Set([lab(w,t)]),o=[w];for(const x of sh(pool,r)){const k=lab(x,t);if(!seen.has(k)){seen.add(k);o.push(x);if(o.length===4)break}}return sh(o,r)}
 function startExam(lv,kind){const pool=DB[lv.id],n=kind==="practice"?30:10;
  ex={lv,kind,qs:shuf(pool).slice(0,n).map((w,k)=>({w,t:k%3,opts:mkOpts(w,k%3,pool)})),i:0,score:0,wrong:[],added:0,picked:null,rt}}
 const exBack=()=>ex.kind==="practice"?["tests/practice","Practice tests"]:["tests/exams","Exams"];
@@ -179,6 +188,67 @@ function result(){const n=ex.qs.length,b=exBack();
  return page(ex.lv.name+(ex.kind==="practice"?" practice":"")+" result","",`<div class="score">${ex.score}/${n}</div><p class="lead">${ex.wrong.length?ex.added+" new word"+(ex.added===1?"":"s")+" added to Adaptive for review.":"Clean sweep. Nothing to add to Adaptive."}</p>`+
  ex.wrong.map(w=>`<div class="mini"><span class="hzs" lang="zh">${w.zh}</span><span>${w.py}</span><small>${w.en}</small></div>`).join("")+
  `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:30px"><button class="main" data-a="retry">Try again</button><button class="main alt" data-a="go" data-h="tests/adaptive">Open Adaptive</button><button class="main alt" data-a="go" data-h="${b[0]}">${b[1]}</button></div>`,b)}
+
+/* ---------- full-length exams ---------- */
+const SP={hsk1:[["Listening",20,15],["Reading",20,17]],hsk2:[["Listening",35,25],["Reading",25,22]],hsk3:[["Listening",40,35],["Reading",30,30],["Writing",10,15]],hsk4:[["Listening",45,30],["Reading",40,40],["Writing",15,25]],hsk5:[["Listening",45,30],["Reading",45,45],["Writing",10,40]],hsk6:[["Listening",50,35],["Reading",50,50],["Writing",10,45]],hsk79:[["Listening",14,20],["Reading",14,25],["Writing",13,25]]};
+const EP=2*DAY;let shc=0;try{shc=+localStorage.getItem("hs-sh")||0}catch(e){}
+const bump=()=>{shc++;try{localStorage.setItem("hs-sh",shc)}catch(e){}};
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const sh=(a,r=Math.random)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const clock=ms=>{ms=Math.max(0,Math.ceil(ms/1000));return Math.floor(ms/60)+":"+String(ms%60).padStart(2,"0")};
+let fe=null;
+function buildExam(lv){const pool=DB[lv.id],r=rng([...lv.id].reduce((h,c)=>h*31+c.charCodeAt(0)|0,7)+(Math.floor(Date.now()/EP)+shc)*1013),ws=sh(pool,r);let k=0;
+ return{lv,si:0,qi:0,done:false,on:false,end:0,added:0,secs:SP[lv.id].map(([name,n,min])=>({name,min,items:Array.from({length:n},(_,i)=>{const w=ws[k++%ws.length],m=name[0],t=m==="L"?i%2:m==="R"?i%3:1;return{w,m,t,opts:m==="W"?null:mkOpts(w,t,pool,r),ans:null}})}))}}
+const fsay=()=>{if(fe&&fe.on&&!fe.done){const q=fe.secs[fe.si].items[fe.qi];if(q.m==="L")speak(q.w.zh)}};
+function finishSec(){fe.si++;fe.qi=0;
+ if(fe.si>=fe.secs.length){fe.done=true;fe.on=false;fe.rep=fe.secs.map(s=>{let c=0;s.items.forEach(q=>{const ok=q.m==="W"?(q.ans||"").trim()===q.w.zh:q.opts[q.ans]===q.w;if(ok)c++;else if(miss(q.w))fe.added++});return{n:s.name,c,t:s.items.length}})}
+ else fe.end=Date.now()+fe.secs[fe.si].min*MIN;draw(false);fsay()}
+function fintro(){const t=fe.secs.reduce((a,s)=>a+s.min,0);
+ return page(fe.lv.name+" exam","Full length and timed. You cannot go back to a section once you finish it, and answers are only revealed in the final report.",fe.secs.map(s=>`<div class="mini"><span class="hzs" style="font:400 22px var(--serif)">${s.name}</span><span>${s.items.length} questions</span><small>${s.min} minutes</small></div>`).join("")+`<p class="note" style="margin-top:16px">${t} minutes in total. Pass mark 60%. Listening plays through your device voice, so use headphones. Questions change every 2 days.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px"><button class="main" data-a="fstart">Start exam</button><button class="main alt" data-a="reshuf">Shuffle questions</button></div>`,["tests/exams","Exams"])}
+function fq(){const s=fe.secs[fe.si],q=s.items[fe.qi],n=s.items.length;let pr,ask,body;
+ if(q.m==="L"){pr=`<button class="main alt" data-a="say" data-t="${q.w.zh}">Play audio</button>`;ask=q.t===0?"Listen. What does it mean?":"Listen. Which word did you hear?"}
+ else if(q.m==="W"){pr=`<div class="en big">${q.w.en}</div><p class="note">${q.w.py}</p>`;ask="Write the word in characters."}
+ else{pr=q.t===1?`<div class="en big">${q.w.en}</div>`:`<div class="hz" lang="zh">${q.w.zh}</div>`;ask=["What does this mean?","Which word means this?","How is this pronounced?"][q.t]}
+ body=q.m==="W"?`<input id="wa" class="search" lang="zh" value="${q.ans||""}" placeholder="汉字" autocomplete="off">`:`<div class="opts">${q.opts.map((o,k)=>`<button class="opt${q.t===1?" zhopt":""}${q.ans===k?" ok":""}" data-a="fa" data-k="${k}">${lab(o,q.t)}</button>`).join("")}</div>`;
+ return page(fe.lv.name+" · "+s.name,`Question ${fe.qi+1} of ${n}`,`<div class="stats"><div><b id="tm">${clock(fe.end-Date.now())}</b>left in this section</div></div><p class="ask">${ask}</p>${pr}${body}<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">${fe.qi>0?'<button class="main alt" data-a="fprev">Previous</button>':""}${fe.qi<n-1?'<button class="main" data-a="fnext">Next</button>':""}<button class="main alt" data-a="ffin">Finish section</button></div>`,null)}
+function frep(){const c=fe.rep.reduce((a,x)=>a+x.c,0),t=fe.rep.reduce((a,x)=>a+x.t,0),p=Math.round(c/t*100);
+ return page(fe.lv.name+" report","",`<div class="score">${p}%</div><p class="lead">${p>=60?"Pass mark reached.":"Below the 60% pass mark."} ${fe.added} missed word${fe.added===1?"":"s"} added to Adaptive.</p>`+fe.rep.map(x=>`<div class="mini"><span class="hzs" style="font:400 22px var(--serif)">${x.n}</span><span>${x.c} of ${x.t} correct</span></div>`).join("")+`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:30px"><button class="main" data-a="reshuf">Shuffle and retake</button><button class="main alt" data-a="go" data-h="tests/adaptive">Open Adaptive</button><button class="main alt" data-a="go" data-h="tests/exams">All exams</button></div>`,["tests/exams","Exams"])}
+
+/* ---------- learning: path, textbooks, reader ---------- */
+const PATH=[
+{id:"pinyin",title:"Pinyin first",sub:"Week 1: the sound system",g:"音",text:"Pinyin spells Mandarin with letters you already know. Every syllable has an {{initial|The opening consonant, like m in mā or sh in shū.}} and a {{final|The vowel part that follows, like a in mā or ing in míng.}}. Learn pinyin before any character, because dictionaries, apps and textbooks all use it. Say each syllable aloud as you read: {{bā, pā, mā, fā|Same final, different initials. Listen for the puff of air in p.}}.",quiz:[["What do beginner guides say to learn first?",["Handwriting","Pinyin","News articles"],1],["In mā, which part is the initial?",["m","ā","The tone mark"],0]]},
+{id:"tones",title:"The four tones",sub:"Lock them in early",g:"调",text:"Mandarin has four tones plus a neutral tone. {{mā 妈|First tone: high and level. Means mother.}}, {{má 麻|Second tone: rising, like a question. Means hemp.}}, {{mǎ 马|Third tone: dips, then rises. Means horse.}} and {{mà 骂|Fourth tone: sharp and falling. Means to scold.}} are four different words. Hear them from a native speaker and get corrected quickly. Learning to recognise tones helps you produce them.",quiz:[["Which tone is high and level?",["First","Second","Fourth"],0],["Which syllable means horse?",["mā","mǎ","mà"],1]]},
+{id:"phrases",title:"First phrases",sub:"Speak from day one",g:"话",text:"Start speaking at once. {{你好 nǐ hǎo|Hello. Literally: you good.}} opens any conversation. {{谢谢 xiè xie|Thank you. The second syllable is neutral tone, short and light.}} and {{再见 zài jiàn|Goodbye. Literally: again see.}} finish your first set. Repeat each phrase aloud, then record yourself and compare.",quiz:[["Which phrase means thank you?",["你好","谢谢","再见"],1],["What does 再见 mean?",["Hello","Sorry","Goodbye"],2]]},
+{id:"characters",title:"Characters and review",sub:"Recognise first, write later",g:"字",text:"Begin with recognition, not handwriting, and learn the most frequent characters first: {{about 1,000 characters cover roughly 90% of everyday text|A frequency fact repeated in beginner guides. It is why common characters come first.}}. Review them with {{spaced repetition|Hard cards return sooner and easy ones return after days or months. This is what the Adaptive tab does.}}, then read short texts in the Reading tab.",quiz:[["Which characters should you learn first?",["Rare ones","The most frequent","Only your name"],1],["What does spaced repetition do?",["Shows hard cards sooner","Hides every card","Repeats at random"],0]]}];
+const TB=[
+{id:"ic",title:"Integrated Chinese",sub:"Cheng & Tsui. Beginner to advanced; common in university courses.",g:"课",text:"Lesson 1 opens with a short dialogue. {{你好!你叫什么名字?|Hello! What is your name? A typical first dialogue: greeting, then asking a name.}} Notice the pattern {{我叫…|My name is… Put your name after 叫.}}. Read the dialogue aloud, then swap in your own name.",quiz:[["Which pattern introduces your name?",["我叫…","我吃…","我去…"],0],["What does 你叫什么名字 ask?",["Your age","Your name","Your city"],1]]},
+{id:"hsk",title:"HSK Standard Course",sub:"BLCU Press. Written to match the HSK syllabus level by level.",g:"考",text:"HSK 1 starts with greetings. {{你好|Hello. One of the 150 words tested at HSK 1.}} and {{谢谢|Thank you. Another HSK 1 word.}} appear in the first lesson. Each unit pairs a short text with {{key words|The new words a test taker should know at that level.}} to memorise.",quiz:[["How many words are tested at HSK 1?",["150","1,200","5,000"],0],["What does 谢谢 mean?",["Thank you","Goodbye","Water"],0]]},
+{id:"fsi",title:"FSI Chinese Basic Course",sub:"US Foreign Service Institute. Drill-based; public domain.",g:"听",text:"This course is built on drills. {{Listen and repeat|Repeating after a model speaker builds automatic pronunciation. This is the core method of the FSI courses.}} each sentence until it feels automatic, then change one word at a time, such as {{我吃米饭|I eat rice. Swap in 面条 (noodles) or 苹果 (apple) to practise substitution.}}.",quiz:[["What is the main drill method?",["Silent reading","Listen and repeat","Translation only"],1],["Which word can replace 米饭 in 我吃米饭?",["面条","学校","老师"],0]]}];
+const SAMPLE="今天北京的天气很好。很多人去公园运动，也有人在学校附近喝茶。地铁公司说，明天会有更多的车。";
+let D=null,chat=[],qz=null,tbOpen=false,LEX=null;
+const lexAll=()=>Promise.all(LV.slice(0,6).map(getLevel)).then(()=>{if(!LEX){LEX=new Map();LV.slice(0,6).forEach(l=>DB[l.id].forEach(w=>{if(!LEX.has(w.zh))LEX.set(w.zh,w)}))}});
+function autoDoc(title,text){const hits=[];let h="";for(let i=0;i<text.length;){let m=null;for(let l=Math.min(4,text.length-i);l>0;l--){const w=LEX.get(text.substr(i,l));if(w){m=w;break}}
+ if(m){h+=`<mark data-a="hit" data-i="${hits.push(m)-1}">${m.zh}</mark>`;i+=m.zh.length}else{const c=text[i++];h+=c==="\n"?"<br>":c.replace(/[&<>]/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[x]))}}
+ return{title,sub:"Highlighted words come from HSK 1 to 6. Tap one to study it.",auto:true,hits,html:h,plain:text}}
+function openDoc(d){D=d;if(!d.auto){d.notes=[];d.html=d.text.replace(/\{\{(.+?)\|(.+?)\}\}/g,(m,t,n)=>`<mark data-a="note" data-i="${d.notes.push({t,n})-1}">${t}</mark>`);d.plain=d.text.replace(/\{\{(.+?)\|.+?\}\}/g,"$1")}
+ chat=[];const pool=LEX?[...LEX.values()]:[];
+ qz={i:0,s:0,p:null,items:d.auto?sh([...new Set(d.hits)]).slice(0,5).map(w=>{const o=mkOpts(w,0,pool);return{q:`What does ${w.zh} (${w.py}) mean?`,o:o.map(x=>x.en),a:o.indexOf(w)}}):d.quiz.map(([q,o,a])=>({q,o,a}))}}
+const chatH=()=>chat.map(m=>`<p><b>${m.r==="user"?"You":"Tutor"}:</b> ${m.t.replace(/</g,"&lt;")}</p>`).join("")||'<p class="note">Ask anything about this text.</p>';
+async function ask(){let k="";try{k=localStorage.getItem("hs-key")||""}catch(e){}
+ if(!k)return"Tap Set API key and paste an Anthropic API key to turn the assistant on.";
+ try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-5-5",max_tokens:400,system:"You are a patient Mandarin tutor for a beginner. Be brief and concrete. The learner is reading this text:\n"+D.plain,messages:chat.map(m=>({role:m.r,content:m.t}))})});
+  const j=await r.json();return(j.content&&j.content[0]&&j.content[0].text)||(j.error&&j.error.message)||"No reply."}catch(e){return"Could not reach the assistant."}}
+function lh(){const z=qz;if(!z.items.length)return'<p class="note">No highlighted words yet. Paste text that contains HSK 1 to 6 vocabulary.</p>';
+ if(z.i>=z.items.length)return`<div class="score" style="font-size:72px">${z.s}/${z.items.length}</div><div style="display:flex;gap:10px;flex-wrap:wrap">${D.auto?'<button class="main" data-a="addall">Add these words to Adaptive</button>':""}<button class="main alt" data-a="qre">Try again</button></div>`;
+ const q=z.items[z.i],d=z.p!=null;
+ return`<p class="ask">Question ${z.i+1} of ${z.items.length}</p><p style="font-size:20px">${q.q}</p><div class="opts">${q.o.map((o,k)=>`<button class="opt${d?(k===q.a?" ok":k===z.p?" bad":""):""}" data-a="qa" data-k="${k}" ${d?"disabled":""}>${o}</button>`).join("")}</div>${d?'<button class="main" data-a="qn">Next</button>':""}`}
+function docView(back){return page(D.title,D.sub,`<div class="reader"><div class="rtext${D.auto?" zh":""}">${D.html}</div><aside class="chat"><b>Reader assistant</b><div class="cl" id="cl">${chatH()}</div><input id="ci" class="search" placeholder="Ask about this text" autocomplete="off" aria-label="Ask the assistant"><div style="display:flex;gap:8px"><button class="ghost" data-a="send">Ask</button><button class="ghost" data-a="key">Set API key</button></div></aside></div><h2>Lesson helper</h2><div id="lh">${lh()}</div>${D.auto?'<button class="link" data-a="rclose">Choose another text</button>':""}<div id="pop"></div>`,back)}
+const pop=h=>{const p=$("#pop");p.innerHTML=h+'<button class="ghost" data-a="closep">Close</button>';p.style.display="block"};
+let pw=null;
+const learnHub=()=>page("Learning","Start with the path, then study alongside a textbook.",row("learning/path","Path","Four steps for a complete beginner","路",3)+row("learning/textbooks","Textbooks","Pick a book and study its pages","书",4),["","Menu"]);
+const pathList=()=>page("Path","Pinyin, then tones, then phrases, then characters: the order beginner guides agree on.",PATH.map((l,i)=>row("learning/path/"+l.id,l.title,l.sub,l.g,i+3)).join(""),["learning","Learning"]);
+const tbPicker=()=>page("Textbooks","Choose a book to study from.",`<button class="main" data-a="tbm" aria-expanded="${tbOpen}">Choose your textbook ${tbOpen?"▴":"▾"}</button>`+(tbOpen?`<div style="margin-top:14px">${TB.map((t,i)=>row("learning/textbooks/"+t.id,t.title,t.sub,t.g,i)).join("")}</div>`:"")+'<p class="note" style="margin-top:26px">These are respected beginner books. The study pages here are original text in the style of each book\'s opening unit. The publishers\' own pages are copyrighted and are not reproduced.</p>',["learning","Learning"]);
+const readingView=()=>D?docView(null):page("Reading","Paste any Chinese article. Words from HSK 1 to 6 are highlighted so you can tap, study and quiz yourself on them.",`<textarea id="rt" class="search" rows="7" style="border-radius:22px;resize:vertical" lang="zh" placeholder="Paste Chinese text here"></textarea><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="main" data-a="rgo">Study this text</button><button class="main alt" data-a="rsample">Use a sample passage</button></div>`,["","Menu"]);
 
 /* adaptive */
 let cur=null,shown=false;
@@ -200,18 +270,25 @@ function adaptive(){const n=Date.now(),all=Object.values(deck);if(!cur||!deck[cu
 let view=home;
 function draw(anim){app.classList.toggle("still",!anim);app.innerHTML=view()}
 let rt=0;
-function route(){const[a,b,c]=location.hash.replace(/^#\/?/,"").split("/").filter(Boolean);cur=null;shown=false;vq="";vn=60;rt++;const lv=LV.find(l=>l.id===c);
+function route(){const[a,b,c]=location.hash.replace(/^#\/?/,"").split("/").filter(Boolean);cur=null;shown=false;vq="";vn=60;rt++;fe=null;D=null;pw=null;tbOpen=false;const lv=LV.find(l=>l.id===c);
  if(!a)view=home;
  else if(a==="tests"&&!b)view=testsHub;
  else if(a==="tests"&&b==="exams")view=examList;
  else if(a==="tests"&&b==="practice"&&!c)view=practiceList;
- else if(a==="tests"&&(b==="exam"||b==="practice")&&lv)view=()=>{const k=b==="exam"?"exam":"practice";
+ else if(a==="tests"&&b==="exam"&&lv)view=()=>{if(!ensure(lv))return loading(lv.name,["tests/exams","Exams"]);if(!fe||fe.lv!==lv)fe=buildExam(lv);return fe.done?frep():fe.on?fq():fintro()};
+ else if(a==="tests"&&b==="practice"&&lv)view=()=>{const k=b==="exam"?"exam":"practice";
   if(!ensure(lv))return loading(lv.name,k==="exam"?["tests/exams","Exams"]:["tests/practice","Practice tests"]);
   if(!ex||ex.rt!==rt)startExam(lv,k);return ex.i>=ex.qs.length?result():question()};
  else if(a==="tests"&&b==="adaptive")view=adaptive;
  else if(a==="vocab"&&!b)view=vocabHub;
  else if(a==="vocab"&&b==="lists"&&!c)view=listIndex;
  else if(a==="vocab"&&b==="list"&&lv)view=()=>listView(lv);
+ else if(a==="learning"&&!b)view=learnHub;
+ else if(a==="learning"&&b==="path"&&!c)view=pathList;
+ else if(a==="learning"&&b==="path"&&PATH.some(x=>x.id===c)){const d=PATH.find(x=>x.id===c);view=()=>{if(D!==d)openDoc(d);return docView(["learning/path","Path"])}}
+ else if(a==="learning"&&b==="textbooks"&&!c)view=tbPicker;
+ else if(a==="learning"&&b==="textbooks"&&TB.some(x=>x.id===c)){const d=TB.find(x=>x.id===c);view=()=>{if(D!==d)openDoc(d);return docView(["learning/textbooks","Textbooks"])}}
+ else if(a==="reading")view=readingView;
  else view=()=>soon(a);
  scrollTo(0,0);draw(true)}
 app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
@@ -223,11 +300,33 @@ app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)retu
  else if(a==="show"){shown=true;speak(cur.zh);draw(false)}
  else if(a==="rate"){deck[cur.zh]=sched(cur,+b.dataset.r);save();cur=null;shown=false;draw(false)}
  else if(a==="seed"){const lv=LV.find(l=>l.id===b.dataset.l);b.textContent="Adding…";getLevel(lv).then(w=>{shuf(w.filter(x=>!deck[x.zh])).slice(0,20).forEach(x=>deck[x.zh]=newCard(x));save();if(location.hash==="#/tests/adaptive")draw(false)})}
+ else if(a==="shufall"){bump();draw(false)}
+ else if(a==="reshuf"){const lv=fe.lv;bump();fe=buildExam(lv);draw(true)}
+ else if(a==="fstart"){fe.on=true;fe.end=Date.now()+fe.secs[0].min*MIN;draw(true);fsay()}
+ else if(a==="fa"){fe.secs[fe.si].items[fe.qi].ans=+b.dataset.k;draw(false)}
+ else if(a==="fprev"){fe.qi--;draw(false);fsay()}
+ else if(a==="fnext"){fe.qi++;draw(false);fsay()}
+ else if(a==="ffin"){if(confirm("Finish this section? You cannot return to it."))finishSec()}
+ else if(a==="tbm"){tbOpen=!tbOpen;draw(false)}
+ else if(a==="note")pop(`<b>${D.notes[+b.dataset.i].t}</b><p>${D.notes[+b.dataset.i].n}</p>`)
+ else if(a==="hit"){pw=D.hits[+b.dataset.i];pop(`<b lang="zh" style="font:700 26px var(--hz)">${pw.zh}</b><p>${pw.py}<br>${pw.en}</p><button class="ghost" data-a="say" data-t="${pw.zh}">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button> `)}
+ else if(a==="addp"){if(pw&&!deck[pw.zh]){deck[pw.zh]=newCard(pw);save()}b.textContent="Added";b.disabled=true}
+ else if(a==="closep")$("#pop").style.display="none"
+ else if(a==="send"){const i=$("#ci"),v=i.value.trim();if(!v)return;chat.push({r:"user",t:v});i.value="";$("#cl").innerHTML=chatH();ask().then(t=>{chat.push({r:"assistant",t});$("#cl").innerHTML=chatH()})}
+ else if(a==="key"){const k=prompt("Paste your Anthropic API key. It is stored only in this browser.");if(k)try{localStorage.setItem("hs-key",k.trim())}catch(e){}}
+ else if(a==="qa"){const q=qz.items[qz.i];if(qz.p==null){qz.p=+b.dataset.k;if(qz.p===q.a)qz.s++}$("#lh").innerHTML=lh()}
+ else if(a==="qn"){qz.i++;qz.p=null;$("#lh").innerHTML=lh()}
+ else if(a==="qre"){qz.i=0;qz.s=0;qz.p=null;$("#lh").innerHTML=lh()}
+ else if(a==="addall"){D.hits.forEach(w=>{if(!deck[w.zh])deck[w.zh]=newCard(w)});save();b.textContent="Added"}
+ else if(a==="rsample")$("#rt").value=SAMPLE
+ else if(a==="rgo"){const t=$("#rt").value;if(!t.trim())return;b.textContent="Loading word lists…";lexAll().then(()=>{openDoc(autoDoc("Your text",t));draw(true)})}
+ else if(a==="rclose"){D=null;draw(true)}
  else if(a==="more"){vn+=60;$("#vl").innerHTML=vlist()}
  else if(a==="addw"){const x=vcur[+b.dataset.i];if(x&&!deck[x.zh]){deck[x.zh]=newCard(x);save()}$("#vl").innerHTML=vlist()}
  else if(a==="reset"&&confirm("Clear everything in Adaptive?")){deck={};save();cur=null;shown=false;draw(false)}});
 addEventListener("hashchange",route);
-app.addEventListener("input",e=>{if(e.target.id==="q"){vq=e.target.value;vn=60;$("#vl").innerHTML=vlist()}});
+setInterval(()=>{if(fe&&fe.on&&!fe.done){const l=fe.end-Date.now();if(l<=0)finishSec();else{const e=$("#tm");if(e)e.textContent=clock(l)}}},1000);
+app.addEventListener("input",e=>{if(e.target.id==="wa")fe.secs[fe.si].items[fe.qi].ans=e.target.value;if(e.target.id==="q"){vq=e.target.value;vn=60;$("#vl").innerHTML=vlist()}});
 setInterval(()=>{if(location.hash==="#/tests/adaptive"&&!cur&&!shown)draw(false)},15000);
 
 /* ---------- theme + flowing background ---------- */
