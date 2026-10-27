@@ -46,7 +46,7 @@ h1{font:400 clamp(44px,9vw,76px)/1 var(--serif);margin:10px 0 14px;letter-spacin
 .bar i{display:block;height:100%;background:var(--ink);transition:width .7s cubic-bezier(.2,.7,.2,1)}
 .ask{color:var(--mut);margin:0 0 6px}
 .hz{font:700 clamp(64px,16vw,96px)/1.1 var(--hz);margin:4px 0 14px}
-.big.en,.en.big{font:400 40px/1.15 var(--serif);margin:4px 0 18px}
+.big.en,.en.big{font:400 clamp(26px,6vw,40px)/1.15 var(--serif);margin:4px 0 18px}
 .opts{display:grid;gap:10px;margin:18px 0}
 .opt,.main,.ghost,.rate button{font:inherit;cursor:pointer;color:var(--ink);background:none;border:1px solid var(--line);transition:background .3s,color .3s,border-color .3s,transform .3s}
 .opt{width:100%;text-align:left;padding:15px 22px;border-radius:30px;font-size:19px}
@@ -79,6 +79,9 @@ h1{font:400 clamp(44px,9vw,76px)/1 var(--serif);margin:10px 0 14px;letter-spacin
 h2{font:400 30px var(--serif);margin:36px 0 6px}
 .seed{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
 .note{color:var(--mut);font-size:15px;max-width:60ch}
+.search{width:100%;padding:14px 22px;border-radius:30px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;margin:0 0 14px}
+.search:focus{outline:none;border-color:var(--ink)}
+.ghost:disabled{opacity:.5;cursor:default}
 .link{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font:inherit;font-size:14px;margin-top:26px;padding:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -98,19 +101,17 @@ const LV=[
 ["hsk6","HSK 6","5,000 words · advanced","六","弊端|bì duān|drawback;干预|gān yù|to intervene;渺小|miǎo xiǎo|tiny;迫不及待|pò bù jí dài|cannot wait;顽强|wán qiáng|tenacious;诚恳|chéng kěn|sincere;慷慨|kāng kǎi|generous;欣慰|xīn wèi|gratified;愧疚|kuì jiù|guilty;轻而易举|qīng ér yì jǔ|effortless;刻不容缓|kè bù róng huǎn|extremely urgent;根深蒂固|gēn shēn dì gù|deep-rooted"],
 ["hsk79","HSK 7–9","one combined advanced exam","高","阐述|chǎn shù|to elaborate;凝聚|níng jù|to rally;渗透|shèn tòu|to permeate;悖论|bèi lùn|paradox;范畴|fàn chóu|category;蕴含|yùn hán|to contain;颠覆|diān fù|to overturn;辩证|biàn zhèng|dialectical;潜移默化|qián yí mò huà|subtle influence;一丝不苟|yì sī bù gǒu|meticulous;脱颖而出|tuō yǐng ér chū|to stand out;意味深长|yì wèi shēn cháng|meaningful"]
 ].map(([id,name,sub,g,s])=>({id,name,sub,g,w:s.split(";").map(x=>{const[zh,py,en]=x.split("|");return{zh,py,en,lvl:name}})}));
-const MENU=[["tests","测试","Tests","Exams, resources and adaptive review"],["vocab","词汇","Vocab",""],["textbooks","课本","Textbooks",""],["reading","阅读","Reading",""],["flashcards","卡片","Flashcards",""],["wordlist","词表","Wordlist",""]];
-const RES=[
-["Official practice",[
-["Chinese Test Service (CTI)","https://www.chinesetest.cn/index.do","The official HSK body: registration, syllabus and current exam format."],
-["Official sample papers and syllabus","http://www.chinesetest.cn/godownload.do","Past sample papers and the test syllabus, straight from the exam board."],
-["HSK Mock","https://www.hskmock.com","Mock platform recognised by CTI. Free level check; full past papers are paid."],
-["Mandarin Bean online HSK tests","https://mandarinbean.com/hsk-chinese-test-online/","Official practice papers taken online with instant scoring. Explanations need premium."],
-["Dig Mandarin practice tests","https://www.digmandarin.com/hsk-practice-test","Printable official practice PDFs with listening MP3s and answer walkthrough videos."]]],
-["Open-source word lists on GitHub",[
-["drkameleon/complete-hsk-vocabulary","https://github.com/drkameleon/complete-hsk-vocabulary","Every HSK 2.0 and 3.0 word as JSON, with pinyin, frequency and forms. MIT licence."],
-["elkmovie/hsk30","https://github.com/elkmovie/hsk30","Word lists for the new HSK 3.0 syllabus."],
-["clem109/hsk-vocabulary","https://github.com/clem109/hsk-vocabulary","Word lists for the classic HSK 2.0 levels."],
-["joelypoley/hsk_standard_course_vocab","https://github.com/joelypoley/hsk_standard_course_vocab","Vocabulary tables digitised from the HSK Standard Course books."]]]];
+const MENU=[["tests","测试","Tests","Exams, practice tests and adaptive review"],["vocab","词汇","Vocab","Every HSK word, searchable"],["textbooks","课本","Textbooks",""],["reading","阅读","Reading",""],["flashcards","卡片","Flashcards",""],["wordlist","词表","Wordlist",""]];
+/* ---------- word data: loaded in full from the open-source repo, shown in our own UI ---------- */
+const DB={},PR={},FB={};
+const SRC=["https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/","https://cdn.jsdelivr.net/gh/drkameleon/complete-hsk-vocabulary@main/"];
+const parse=(d,lvl)=>d.map(e=>{const f=(e.f||e.forms||[])[0]||{},tr=f.i||f.transcriptions||{},m=f.m||f.meanings||[];
+ return{zh:e.s||e.simplified,py:tr.y||tr.pinyin||"",en:m.join("; ").split("; ").slice(0,2).join("; ").slice(0,56),lvl}}).filter(w=>w.zh&&w.py&&w.en);
+async function fetchLevel(lv){const i=LV.indexOf(lv),p=i<6?"old/"+(i+1):"new/7";
+ for(const b of SRC){try{const r=await fetch(b+"wordlists/exclusive/"+p+".min.json");if(!r.ok)continue;const w=parse(await r.json(),lv.name);if(w.length>20)return w}catch(e){}}
+ throw 0}
+const getLevel=lv=>PR[lv.id]||(PR[lv.id]=fetchLevel(lv).then(w=>DB[lv.id]=w).catch(()=>{FB[lv.id]=1;return DB[lv.id]=lv.w}));
+function ensure(lv){if(DB[lv.id])return true;const my=rt;getLevel(lv).then(()=>{if(my===rt)draw(true)});return false}
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s),app=$("#app");
@@ -145,30 +146,39 @@ function pickCard(){const n=Date.now(),all=Object.values(deck);
 /* ---------- views ---------- */
 const page=(h,sub,body,back)=>`<div class="page">${back?`<a class="back" href="#/${back[0]}" style="--i:0">${back[1]}</a>`:""}<h1 style="--i:1">${h}</h1>${sub?`<p class="lead" style="--i:2">${sub}</p>`:""}<div class="body">${body}</div></div>`;
 const row=(h,t,d,g,i,cls="")=>`<a class="row ${cls}" href="#/${h}" style="--i:${i}"><span><b>${t}</b><small>${d}</small></span><span class="g" lang="zh">${g}</span></a>`;
-const xrow=(u,t,d,i)=>`<a class="row" href="${u}" target="_blank" rel="noopener" style="--i:${i}"><span><b style="font-size:22px">${t}</b><small>${d}</small></span><span class="g" style="font:400 22px var(--sans)">↗</span></a>`;
-const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2]+(i?'<span class="tag">soon</span>':""),m[3],m[1],i+3,"big")).join(""));
+const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2]+(i>1?'<span class="tag">soon</span>':""),m[3],m[1],i+3,"big")).join(""));
 const soon=a=>{const m=MENU.find(x=>x[0]===a);return m?page(m[2],"This section is next on the list.","",["","Menu"]):home()};
 const testsHub=()=>{const n=Date.now(),d=Object.values(deck).filter(c=>c.due<=n).length;
- return page("Tests","Check where you stand, find real papers, and drill what you keep missing.",
- row("tests/exams","Exams","One section for each level, HSK 1 to 9","考",3)+row("tests/resources","Practice and resources","Official papers and trusted GitHub repos","源",4)+row("tests/adaptive","Adaptive",d?d+" due now":"Spaced review of the words you struggle with","适",5),["","Menu"])};
-const examList=()=>page("Exams","Ten questions per level, built from that level's vocabulary. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/exam/"+l.id,l.name,l.sub,l.g,i+3)).join(""),["tests","Tests"]);
-const resources=()=>page("Practice and resources","Real exam papers are best for exam day. Regular 2026 HSK 1–6 dates still use the 2.0 format, so check chinesetest.cn before you book.",
- RES.map(([h,items],k)=>`<h2 style="animation-delay:${k*200}ms">${h}</h2>`+items.map((x,i)=>xrow(x[1],x[0],x[2],i+k*5+3)).join("")).join(""),["tests","Tests"]);
+ return page("Tests","Check where you stand, take longer practice sets, and drill what you keep missing.",
+ row("tests/exams","Exams","One section for each level, HSK 1 to 9","考",3)+row("tests/practice","Practice tests","Longer sets drawn from the full word lists","练",4)+row("tests/adaptive","Adaptive",d?d+" due now":"Spaced review of the words you struggle with","适",5),["","Menu"])};
+const examList=()=>page("Exams","Ten questions per level, drawn from the complete HSK word list. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/exam/"+l.id,l.name,l.sub+" · 10 questions",l.g,i+3)).join(""),["tests","Tests"]);
+const credit='<p class="note" style="margin-top:34px">Word data: Complete HSK Vocabulary (MIT licence). Definitions: CC-CEDICT (CC BY-SA 4.0).</p>';
+const loading=(h,b)=>page(h,"Loading the word list…","",b);
+const practiceList=()=>page("Practice tests","Thirty questions per set, drawn from the complete word list for each level. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/practice/"+l.id,l.name,l.sub+" · 30 questions",l.g,i+3)).join("")+credit,["tests","Tests"]);
+const vocabHub=()=>page("Vocab","Every HSK word, searchable and ready to send to Adaptive.",row("vocab/lists","Word lists","HSK 1 to 9, loaded in full","词",3)+credit,["","Menu"]);
+const listIndex=()=>page("Word lists","Pick a level.",LV.map((l,i)=>row("vocab/list/"+l.id,l.name,l.sub,l.g,i+3)).join("")+credit,["vocab","Vocab"]);
+let vq="",vn=60,vcur=[],vlv=null;
+function vlist(){const w=DB[vlv.id],q=vq.trim().toLowerCase();vcur=q?w.filter(x=>x.zh.includes(q)||x.py.toLowerCase().includes(q)||x.en.toLowerCase().includes(q)):w;
+ return `<p class="note">${vcur.length} word${vcur.length===1?"":"s"}</p>`+vcur.slice(0,vn).map((x,i)=>`<div class="mini"><span class="hzs" lang="zh">${x.zh}</span><span>${x.py} · ${x.en}</span><span style="grid-column:2;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" data-a="say" data-t="${x.zh}">Listen</button><button class="ghost" data-a="addw" data-i="${i}" ${deck[x.zh]?"disabled":""}>${deck[x.zh]?"In Adaptive":"Add to Adaptive"}</button></span></div>`).join("")+(vcur.length>vn?`<button class="main alt" data-a="more" style="margin-top:20px">Show more</button>`:"")}
+function listView(lv){vlv=lv;if(!ensure(lv))return loading(lv.name,["vocab/lists","Word lists"]);
+ return page(lv.name,lv.sub,(FB[lv.id]?'<p class="note">Could not reach the word-list server, so this is the small built-in starter set.</p>':"")+`<input id="q" class="search" type="search" placeholder="Search hanzi, pinyin or English" autocomplete="off" aria-label="Search words"><div id="vl">${vlist()}</div>`+credit,["vocab/lists","Word lists"])}
 
 /* exams */
 let ex=null;
-function startExam(id){const lv=LV.find(l=>l.id===id),pool=lv.w;
- const qs=shuf(pool).slice(0,10).map((w,k)=>({w,t:k%3,opts:shuf([w,...shuf(pool.filter(x=>x!==w)).slice(0,3)])}));
- ex={lv,qs,i:0,score:0,wrong:[],added:0,picked:null}}
-function question(){const q=ex.qs[ex.i],t=q.t,n=ex.qs.length,done=ex.picked!=null,lab=w=>t===0?w.en:t===1?w.zh:w.py;
+const lab=(w,t)=>t===0?w.en:t===1?w.zh:w.py;
+function mkOpts(w,t,pool){const seen=new Set([lab(w,t)]),o=[w];for(const x of shuf(pool)){const k=lab(x,t);if(!seen.has(k)){seen.add(k);o.push(x);if(o.length===4)break}}return shuf(o)}
+function startExam(lv,kind){const pool=DB[lv.id],n=kind==="practice"?30:10;
+ ex={lv,kind,qs:shuf(pool).slice(0,n).map((w,k)=>({w,t:k%3,opts:mkOpts(w,k%3,pool)})),i:0,score:0,wrong:[],added:0,picked:null,rt}}
+const exBack=()=>ex.kind==="practice"?["tests/practice","Practice tests"]:["tests/exams","Exams"];
+function question(){const q=ex.qs[ex.i],t=q.t,n=ex.qs.length,done=ex.picked!=null;
  const prompt=t===1?`<div class="en big">${q.w.en}</div>`:`<div class="hz" lang="zh">${q.w.zh}</div>`;
- const opts=q.opts.map((o,k)=>{let c="opt"+(t===1?" zhopt":"");if(done){if(o===q.w)c+=" ok";else if(k===ex.picked)c+=" bad"}return`<button class="${c}" data-a="pick" data-k="${k}" ${done?"disabled":""}>${lab(o)}</button>`}).join("");
+ const opts=q.opts.map((o,k)=>{let c="opt"+(t===1?" zhopt":"");if(done){if(o===q.w)c+=" ok";else if(k===ex.picked)c+=" bad"}return`<button class="${c}" data-a="pick" data-k="${k}" ${done?"disabled":""}>${lab(o,t)}</button>`}).join("");
  const right=done&&q.opts[ex.picked]===q.w;
- return page(ex.lv.name,`Question ${ex.i+1} of ${n}`,`<div class="bar"><i style="width:${ex.i/n*100}%"></i></div><p class="ask">${["What does this mean?","Which word means this?","How is this pronounced?"][t]}</p>${prompt}${t!==1?`<button class="ghost" data-a="say" data-t="${q.w.zh}">Listen</button>`:""}<div class="opts">${opts}</div>${done?`<div class="fb">${right?"Correct.":`Not quite: ${q.w.zh} is ${q.w.py}, “${q.w.en}”. Added to Adaptive.`}</div><button class="main" data-a="next">${ex.i+1<n?"Next question":"See results"}</button>`:""}`,["tests/exams","Exams"])}
-function result(){const n=ex.qs.length;
- return page(ex.lv.name+" result","",`<div class="score">${ex.score}/${n}</div><p class="lead">${ex.wrong.length?ex.added+" new word"+(ex.added===1?"":"s")+" added to Adaptive for review.":"Clean sweep. Nothing to add to Adaptive."}</p>`+
+ return page(ex.lv.name+(ex.kind==="practice"?" practice":""),`Question ${ex.i+1} of ${n}`,`<div class="bar"><i style="width:${ex.i/n*100}%"></i></div><p class="ask">${["What does this mean?","Which word means this?","How is this pronounced?"][t]}</p>${prompt}${t!==1?`<button class="ghost" data-a="say" data-t="${q.w.zh}">Listen</button>`:""}<div class="opts">${opts}</div>${done?`<div class="fb">${right?"Correct.":`Not quite: ${q.w.zh} is ${q.w.py}, “${q.w.en}”. Added to Adaptive.`}</div><button class="main" data-a="next">${ex.i+1<n?"Next question":"See results"}</button>`:""}`,exBack())}
+function result(){const n=ex.qs.length,b=exBack();
+ return page(ex.lv.name+(ex.kind==="practice"?" practice":"")+" result","",`<div class="score">${ex.score}/${n}</div><p class="lead">${ex.wrong.length?ex.added+" new word"+(ex.added===1?"":"s")+" added to Adaptive for review.":"Clean sweep. Nothing to add to Adaptive."}</p>`+
  ex.wrong.map(w=>`<div class="mini"><span class="hzs" lang="zh">${w.zh}</span><span>${w.py}</span><small>${w.en}</small></div>`).join("")+
- `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:30px"><button class="main" data-a="retry">Try again</button><button class="main alt" data-a="go" data-h="tests/adaptive">Open Adaptive</button><button class="main alt" data-a="go" data-h="tests/exams">All exams</button></div>`,["tests/exams","Exams"])}
+ `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:30px"><button class="main" data-a="retry">Try again</button><button class="main alt" data-a="go" data-h="tests/adaptive">Open Adaptive</button><button class="main alt" data-a="go" data-h="${b[0]}">${b[1]}</button></div>`,b)}
 
 /* adaptive */
 let cur=null,shown=false;
@@ -178,37 +188,46 @@ function adaptive(){const n=Date.now(),all=Object.values(deck);if(!cur||!deck[cu
  if(cur){main=`<div class="card"><div class="hz" lang="zh">${cur.zh}</div>${shown?`<div class="py">${cur.py}</div><p class="en" style="margin:4px 0 12px;font-size:20px">${cur.en}</p>`:`<div class="hint">Recall the meaning and the pronunciation</div>`}<button class="ghost" data-a="say" data-t="${cur.zh}">Listen</button></div>`+
   (shown?`<div class="rate">${["Again","Hard","Good","Easy"].map((l,i)=>`<button data-a="rate" data-r="${i+1}"><b>${l}</b><span>${fmt(sched(cur,i+1).due-n)}</span></button>`).join("")}</div>`:`<button class="main" data-a="show" style="margin-bottom:34px">Show answer</button>`)}
  else if(all.length){const nx=all.reduce((a,b)=>a.due<b.due?a:b);main=`<div class="card"><div class="hz" style="font-size:56px">✓</div><p class="note" style="margin:0 auto">All caught up. Next card ${dueIn(nx,n)}.</p></div>`}
- else main=`<div class="card"><p class="note" style="margin:0 auto">Nothing here yet. Words you miss in an exam land here automatically, or add a whole level below.</p></div>`;
+ else main=`<div class="card"><p class="note" style="margin:0 auto">Nothing here yet. Words you miss in an exam land here automatically, or add 20 words from a level below.</p></div>`;
  const work=all.filter(c=>c.state!=="review"||c.ivl<21).sort((a,b)=>a.due-b.due).slice(0,20);
  const lbl={new:"new",learn:"learning",relearn:"relearning",review:"young"};
  return page("Adaptive","Scheduled the way Anki does it: hard words return within minutes, easy ones drift out to days and months.",
  `<div class="stats"><div><b>${due}</b>due now</div><div><b>${lrn}</b>learning</div><div><b>${mat}</b>mature</div><div><b>${all.length}</b>total</div></div>${main}`+
  (work.length?`<h2>Working on</h2>`+work.map(c=>`<div class="mini"><span class="hzs" lang="zh">${c.zh}</span><span>${c.py} · ${c.en}</span><small>${lbl[c.state]} · ease ${Math.round(c.ease*100)}%${c.lapses?" · lapses "+c.lapses:""}</small><small class="r" style="grid-column:2">${dueIn(c,n)}</small></div>`).join(""):"")+
- `<h2>Add a level</h2><div class="seed">${LV.map(l=>`<button class="ghost" data-a="seed" data-l="${l.id}">${l.name}</button>`).join("")}</div>${all.length?`<button class="link" data-a="reset">Reset Adaptive</button>`:""}`,["tests","Tests"])}
+ `<h2>Add 20 words from a level</h2><div class="seed">${LV.map(l=>`<button class="ghost" data-a="seed" data-l="${l.id}">${l.name}</button>`).join("")}</div>${all.length?`<button class="link" data-a="reset">Reset Adaptive</button>`:""}`,["tests","Tests"])}
 
 /* ---------- router + events ---------- */
 let view=home;
 function draw(anim){app.classList.toggle("still",!anim);app.innerHTML=view()}
-function route(){const[a,b,c]=location.hash.replace(/^#\/?/,"").split("/").filter(Boolean);cur=null;shown=false;
+let rt=0;
+function route(){const[a,b,c]=location.hash.replace(/^#\/?/,"").split("/").filter(Boolean);cur=null;shown=false;vq="";vn=60;rt++;const lv=LV.find(l=>l.id===c);
  if(!a)view=home;
  else if(a==="tests"&&!b)view=testsHub;
  else if(a==="tests"&&b==="exams")view=examList;
- else if(a==="tests"&&b==="exam"&&LV.some(l=>l.id===c)){startExam(c);view=()=>ex.i>=ex.qs.length?result():question()}
- else if(a==="tests"&&b==="resources")view=resources;
+ else if(a==="tests"&&b==="practice"&&!c)view=practiceList;
+ else if(a==="tests"&&(b==="exam"||b==="practice")&&lv)view=()=>{const k=b==="exam"?"exam":"practice";
+  if(!ensure(lv))return loading(lv.name,k==="exam"?["tests/exams","Exams"]:["tests/practice","Practice tests"]);
+  if(!ex||ex.rt!==rt)startExam(lv,k);return ex.i>=ex.qs.length?result():question()};
  else if(a==="tests"&&b==="adaptive")view=adaptive;
+ else if(a==="vocab"&&!b)view=vocabHub;
+ else if(a==="vocab"&&b==="lists"&&!c)view=listIndex;
+ else if(a==="vocab"&&b==="list"&&lv)view=()=>listView(lv);
  else view=()=>soon(a);
  scrollTo(0,0);draw(true)}
 app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
  if(a==="say")speak(b.dataset.t);
  else if(a==="pick"&&ex.picked==null){const q=ex.qs[ex.i];ex.picked=+b.dataset.k;if(q.opts[ex.picked]===q.w)ex.score++;else{ex.wrong.push(q.w);if(miss(q.w))ex.added++}draw(false)}
  else if(a==="next"){ex.i++;ex.picked=null;draw(ex.i>=ex.qs.length)}
- else if(a==="retry"){startExam(ex.lv.id);draw(true)}
+ else if(a==="retry"){startExam(ex.lv,ex.kind);draw(true)}
  else if(a==="go")location.hash="#/"+b.dataset.h;
  else if(a==="show"){shown=true;speak(cur.zh);draw(false)}
  else if(a==="rate"){deck[cur.zh]=sched(cur,+b.dataset.r);save();cur=null;shown=false;draw(false)}
- else if(a==="seed"){LV.find(l=>l.id===b.dataset.l).w.forEach(w=>{if(!deck[w.zh])deck[w.zh]=newCard(w)});save();draw(false)}
+ else if(a==="seed"){const lv=LV.find(l=>l.id===b.dataset.l);b.textContent="Adding…";getLevel(lv).then(w=>{shuf(w.filter(x=>!deck[x.zh])).slice(0,20).forEach(x=>deck[x.zh]=newCard(x));save();if(location.hash==="#/tests/adaptive")draw(false)})}
+ else if(a==="more"){vn+=60;$("#vl").innerHTML=vlist()}
+ else if(a==="addw"){const x=vcur[+b.dataset.i];if(x&&!deck[x.zh]){deck[x.zh]=newCard(x);save()}$("#vl").innerHTML=vlist()}
  else if(a==="reset"&&confirm("Clear everything in Adaptive?")){deck={};save();cur=null;shown=false;draw(false)}});
 addEventListener("hashchange",route);
+app.addEventListener("input",e=>{if(e.target.id==="q"){vq=e.target.value;vn=60;$("#vl").innerHTML=vlist()}});
 setInterval(()=>{if(location.hash==="#/tests/adaptive"&&!cur&&!shown)draw(false)},15000);
 
 /* ---------- theme + flowing background ---------- */
