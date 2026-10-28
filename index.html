@@ -291,6 +291,19 @@ function lh(){const z=qz;if(!z.items.length)return'<p class="note">No highlighte
  const q=z.items[z.i],d=z.p!=null;
  return`<p class="ask">Question ${z.i+1} of ${z.items.length}</p><p style="font-size:20px">${q.q}</p><div class="opts">${q.o.map((o,k)=>`<button class="opt${d?(k===q.a?" ok":k===z.p?" bad":""):""}" data-a="qa" data-k="${k}" ${d?"disabled":""}>${o}</button>`).join("")}</div>${d?'<button class="main" data-a="qn">Next</button>':""}`}
 function docView(back,extra=""){const showSource=D.source?'<a class="source-link" href="'+esc(D.source)+'" target="_blank" rel="noopener noreferrer">Open source article ↗</a>':"";return page(D.title,D.sub,'<div class="reader-topbar"><span>READING</span><div class="reader-tools">'+(extra||"")+showSource+'</div></div><div class="reader"><div class="rtext'+(D.auto?' zh':'')+(/^wb\//.test(D.id||"")?' wiki':'')+'">'+D.html+'</div><aside class="chat"><div class="assistant-tabs"><button data-a="assistTab" data-k="assistant" aria-pressed="'+(assistTab==="assistant")+'">Assistant</button><button data-a="assistTab" data-k="quiz" aria-pressed="'+(assistTab==="quiz")+'">Quiz</button></div>'+(assistTab==="assistant"?'<b>Reader assistant</b><div class="cl" id="cl">'+chatH()+'</div><input id="ci" class="search" placeholder="Ask about this text" autocomplete="off" aria-label="Ask the assistant"><div style="display:flex;gap:8px"><button class="ghost" data-a="send">Ask</button><button class="ghost" data-a="key">Set API key</button></div>':'<b>Reading quiz</b><div id="lh" class="quiz-compact" style="margin-top:10px">'+lh()+'</div>')+'</aside></div>'+'<div id="pop"></div>',back)}
+const dictCache={};
+async function lookupDictionary(w,anchor,url){
+ try{
+  const endpoint="https://en.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&exsentences=5&titles="+encodeURIComponent(w.zh)+"&format=json&origin=*";
+  const response=await fetch(endpoint);if(!response.ok)throw new Error("Dictionary request failed");
+  const data=await response.json(),entry=Object.values(data.query.pages||{})[0],raw=(entry&&entry.extract||"").replace(/\s+/g," ").trim();
+  if(!raw||entry.missing!==undefined)throw new Error("No dictionary entry");
+  const definition=raw.slice(0,420);dictCache[w.zh]=definition;w.en=definition;
+  if(pw&&pw.zh===w.zh)pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(w.zh)+'</b><p>'+esc(w.py||"")+(w.py?'<br>':"")+esc(definition)+'</p><a class="source-link" href="'+url+'" target="_blank" rel="noopener noreferrer">Open full dictionary entry ↗</a><p><button class="ghost" data-a="say" data-t="'+esc(w.zh)+'">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button></p>',anchor);
+ }catch(e){
+  if(pw&&pw.zh===w.zh)pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(w.zh)+'</b><p>No HSK definition is available offline for this phrase yet.</p><a class="source-link" href="'+url+'" target="_blank" rel="noopener noreferrer">Look up definition on Wiktionary ↗</a><p><button class="ghost" data-a="say" data-t="'+esc(w.zh)+'">Listen</button></p>',anchor);
+ }
+}
 const pop=(h,anchor)=>{const p=$("#pop");p.innerHTML=h+'<button class="ghost" data-a="closep">Close</button>';p.style.display="block";p.style.left="16px";p.style.top="16px";const r=anchor&&anchor.getBoundingClientRect?anchor.getBoundingClientRect():null,pr=p.getBoundingClientRect(),pad=12;let left=r?r.left+r.width/2-pr.width/2:innerWidth-pr.width-pad;left=Math.max(pad,Math.min(left,innerWidth-pr.width-pad));let top=r?r.top-pr.height-10:pad;if(top<pad&&r)top=Math.min(innerHeight-pr.height-pad,r.bottom+10);top=Math.max(pad,Math.min(top,innerHeight-pr.height-pad));p.style.left=left+"px";p.style.top=top+"px"};
 let pw=null;
 const learnHub=()=>page("Learning","Start with the path, then study alongside a textbook.",row("learning/path","Path","Four steps for a complete beginner","路",3)+row("learning/textbooks","Textbooks","Pick a book and study its pages","书",4),["","Menu"]);
@@ -336,7 +349,7 @@ function buildDoc(id,title,sub,html,concepts={}){const doc=new DOMParser().parse
   for(let i=0;i<x.length;){let hit=false;for(const t of terms){if(x.startsWith(t,i)){h+=`<mark data-a="note" data-i="${notes.push({t,n:concepts[t]})-1}">${t}</mark>`;i+=t.length;hit=true;break}}
    if(hit)continue;let m=null;for(let l=Math.min(8,x.length-i);l>0;l--){const w=LEX&&LEX.get(x.substr(i,l));if(w){m=w;break}}
    if(m){h+=`<mark data-a="hit" data-i="${hits.push(m)-1}">${m.zh}</mark>`;i+=m.zh.length}
-   else if(/[一-鿿]/.test(x[i])){const zh=x[i++],fallback={zh,py:"",en:"This character is not in the loaded HSK word lists. Ask the reader assistant for its meaning.",lvl:"Dictionary lookup"};h+=`<mark data-a="hit" data-i="${hits.push(fallback)-1}">${zh}</mark>`}
+   else if(/[一-鿿]/.test(x[i])){let end=i+1;while(end<x.length&&end-i<6&&/[一-鿿]/.test(x[end])){let known=false;for(let l=Math.min(8,x.length-end);l>0;l--){if(LEX&&LEX.get(x.substr(end,l))){known=true;break}}if(known)break;end++}const zh=x.slice(i,end);i=end;const fallback={zh,py:"",en:"Looking up this word in the dictionary…",lvl:"Dictionary lookup"};h+=`<mark data-a="hit" data-i="${hits.push(fallback)-1}">${zh}</mark>`}
    else h+=esc(x[i++])}
   const tp=document.createElement("template");tp.innerHTML=h;nd.replaceWith(tp.content)});
  return{id,title,sub,auto:true,hits,notes,html:doc.innerHTML,plain:doc.textContent.replace(/\s+/g," ").slice(0,1500)}}
@@ -446,7 +459,7 @@ app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)retu
  else if(a==="tbm"){tbOpen=!tbOpen;draw(false)}
  else if(a==="assistTab"){assistTab=b.dataset.k==="quiz"?"quiz":"assistant";draw(false)}
  else if(a==="note"){const n=D.notes[+b.dataset.i];if(n)pop("<b>"+esc(n.t)+"</b><p>"+esc(n.n)+"</p>",b)}
- else if(a==="hit"){pw=D.hits[+b.dataset.i];if(pw)pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(pw.zh)+'</b><p>'+esc(pw.py||"")+(pw.py?'<br>':"")+esc(pw.en||"Definition not available")+'</p><button class="ghost" data-a="say" data-t="'+esc(pw.zh)+'">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button>',b)}
+ else if(a==="hit"){pw=D.hits[+b.dataset.i];if(pw){const url="https://en.wiktionary.org/wiki/"+encodeURIComponent(pw.zh);pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(pw.zh)+'</b><p>'+esc(pw.py||"")+(pw.py?'<br>':"")+esc(pw.en||"Definition not available")+(pw.lvl==="Dictionary lookup"?"<br>Looking it up…":"") + '</p><a class="source-link" href="'+url+'" target="_blank" rel="noopener noreferrer">Open full dictionary entry ↗</a><p><button class="ghost" data-a="say" data-t="'+esc(pw.zh)+'">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button></p>',b);if(pw.lvl==="Dictionary lookup")lookupDictionary(pw,b,url)}}
  else if(a==="dict"){const w=vcur[+b.dataset.i];if(w){pw=w;pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(w.zh)+'</b><p>'+esc(w.py||"")+(w.py?'<br>':"")+esc(w.en||"Definition not available")+'</p><button class="ghost" data-a="say" data-t="'+esc(w.zh)+'">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button>',b)}}
  else if(a==="addp"){if(pw&&!deck[pw.zh]){deck[pw.zh]=newCard(pw);save()}b.textContent="Added";b.disabled=true}
  else if(a==="closep")$("#pop").style.display="none"
