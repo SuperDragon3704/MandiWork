@@ -6,21 +6,434 @@
 <title>Hanzi Steps</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='black'/><text x='50' y='72' font-size='64' text-anchor='middle' fill='white'>汉</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Hanken+Grotesk:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--bg:#000;--ink:#fff;--rgb:255,255,255;--mut:rgba(var(--rgb),.6);--line:rgba(var(--rgb),.24);
+--serif:"Instrument Serif","Times New Roman",serif;--sans:"Hanken Grotesk",system-ui,sans-serif;--hz:"Noto Serif SC","Songti SC","Noto Serif CJK SC",serif;color-scheme:dark}
+:root[data-theme="light"]{--bg:#fff;--ink:#000;--rgb:0,0,0;color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--sans);min-height:100vh;transition:background .6s,color .6s;
+padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+header,main{position:relative;z-index:1;max-width:780px;margin:0 auto;padding-left:22px;padding-right:22px}
+header{display:flex;justify-content:space-between;align-items:center;padding-top:22px}
+.brand{font:700 30px var(--hz);color:var(--ink);text-decoration:none}
+#inv{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink);font-size:18px;cursor:pointer;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+#inv:hover{transform:rotate(180deg)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+main{padding-top:28px;padding-bottom:80px}
+h1{font:400 clamp(44px,9vw,76px)/1 var(--serif);margin:10px 0 14px;letter-spacing:-.02em}
+.lead{color:var(--mut);max-width:46ch;margin:0 0 34px}
+.back{color:var(--mut);text-decoration:none;font-size:15px;display:inline-block;transition:transform .4s,color .3s}
+.back:hover{color:var(--ink);transform:translateX(-6px)}
+.back::before{content:"\2190  "}
+@keyframes rise{from{opacity:0;transform:translateY(26px);filter:blur(10px)}to{opacity:1;transform:none;filter:blur(0)}}
+.page>*,.row{animation:rise .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+.page>.body{animation-delay:.12s}
+.still *{animation:none!important}
+.row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 4px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;position:relative;transition:padding .5s cubic-bezier(.2,.7,.2,1)}
+.row::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:100%;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.row:hover,.row:focus-visible{padding-left:18px}
+.row:hover::after,.row:focus-visible::after{transform:scaleX(1)}
+.row b{display:block;font:400 26px/1.15 var(--serif);font-weight:400}
+.row small{color:var(--mut);font-size:15px}
+.big b{font-size:clamp(38px,8vw,58px);letter-spacing:-.02em}
+.g{font:700 34px var(--hz);transition:transform .7s cubic-bezier(.2,.7,.2,1);flex:none}
+.big .g{font-size:46px}
+.row:hover .g{transform:translateY(-4px) rotate(-6deg) scale(1.12)}
+.tag{display:inline-block;margin-left:10px;font:15px var(--sans);color:var(--mut);vertical-align:middle}
+.bar{height:2px;background:var(--line);margin:0 0 26px}
+.bar i{display:block;height:100%;background:var(--ink);transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.ask{color:var(--mut);margin:0 0 6px}
+.hz{font:700 clamp(64px,16vw,96px)/1.1 var(--hz);margin:4px 0 14px}
+.big.en,.en.big{font:400 clamp(26px,6vw,40px)/1.15 var(--serif);margin:4px 0 18px}
+.opts{display:grid;gap:10px;margin:18px 0}
+.opt,.main,.ghost,.rate button{font:inherit;cursor:pointer;color:var(--ink);background:none;border:1px solid var(--line);transition:background .3s,color .3s,border-color .3s,transform .3s}
+.opt{width:100%;text-align:left;padding:15px 22px;border-radius:30px;font-size:19px}
+.zhopt{font-family:var(--hz);font-size:26px}
+.opt:hover:not(:disabled),.ghost:hover,.rate button:hover{background:rgba(var(--rgb),.1);border-color:var(--ink)}
+.opt:disabled{opacity:.5;cursor:default}
+.opt.ok{background:var(--ink);color:var(--bg);border-color:var(--ink);opacity:1}
+.opt.bad{border-style:dashed;text-decoration:line-through}
+.main{background:var(--ink);color:var(--bg);border-color:var(--ink);padding:14px 30px;border-radius:30px;font-weight:700}
+.main:hover{transform:translateY(-2px)}
+.main.alt{background:none;color:var(--ink);border-color:var(--line)}
+.ghost{padding:7px 18px;border-radius:30px;font-size:14px}
+.fb{margin:6px 0 18px;min-height:28px}
+.score{font:400 clamp(90px,24vw,150px)/1 var(--serif);margin:6px 0}
+.mini{display:grid;grid-template-columns:minmax(96px,auto) 1fr;gap:4px 16px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.mini .hzs{font:700 24px var(--hz);grid-row:span 2}
+.mini small{color:var(--mut)}
+.mini .r{text-align:right}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin:0 0 26px}
+.stats div{font:400 15px var(--sans);color:var(--mut)}
+.stats b{display:block;font:400 44px/1 var(--serif);color:var(--ink)}
+.card{border:1px solid var(--line);border-radius:28px;padding:34px 22px;text-align:center;margin-bottom:16px;background:rgba(var(--rgb),.03)}
+.card .hz{margin-top:0}
+.card .py{font:400 32px var(--serif)}
+.card .hint{color:var(--mut);margin:8px 0 14px}
+.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:34px}
+.rate button{padding:12px 4px;border-radius:20px}
+.rate b{display:block;font-weight:500}
+.rate span{font-size:13px;color:var(--mut)}
+h2{font:400 30px var(--serif);margin:36px 0 6px}
+.seed{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.note{color:var(--mut);font-size:15px;max-width:60ch}
+.search{width:100%;padding:14px 22px;border-radius:30px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;margin:0 0 14px}
+.search:focus{outline:none;border-color:var(--ink)}
+.ghost:disabled{opacity:.5;cursor:default}
+.reader{display:grid;grid-template-columns:1fr 270px;gap:26px;align-items:start}
+@media(max-width:760px){.reader{grid-template-columns:1fr}}
+.rtext{font:400 21px/1.9 var(--serif)}.rtext.zh{font-family:var(--hz);font-size:23px}
+mark{background:none;color:var(--ink);border-bottom:2px solid var(--ink);cursor:pointer;padding:0 1px;transition:background .3s,color .3s}
+mark:hover{background:var(--ink);color:var(--bg)}
+.chat{border:1px solid var(--line);border-radius:22px;padding:14px;font-size:14px}
+.cl{max-height:250px;overflow:auto;margin:8px 0}.cl p{margin:6px 0}
+#pop{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(300px,calc(100vw - 32px));background:var(--bg);border:1px solid var(--ink);border-radius:22px;padding:16px 18px;z-index:5}
+#pop p{margin:6px 0 10px}
+.link{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font:inherit;font-size:14px;margin-top:26px;padding:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.rtext.wiki{font:400 18px/1.75 var(--sans)}.rtext.wiki h2,.rtext.wiki h3{font:400 28px var(--serif);margin:26px 0 8px}
+.rtext table{width:100%;border-collapse:collapse;font-size:16px;margin:12px 0;display:block;overflow-x:auto}
+.rtext td,.rtext th{border:1px solid var(--line);padding:6px 9px;text-align:left}
+.ghost[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+.calh{display:flex;justify-content:space-between;align-items:center;margin:18px 0 10px}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.cgrid em{font-style:normal;color:var(--mut);font-size:13px}
+.day{padding:10px 0;border:1px solid var(--line);border-radius:12px;font-weight:400}
+.day.done{background:#2ecc71;color:#000;border-color:#2ecc71;font-weight:700}
+.day.today{outline:2px solid var(--ink);outline-offset:1px}
+.qbox{border:1px solid var(--line);border-radius:28px;padding:22px;margin-bottom:26px;background:rgba(var(--rgb),.03)}
+</style>
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
-<header><a class="brand" href="#/" lang="zh" aria-label="Menu">汉</a><button id="inv" aria-label="Swap black and white">◐</button></header>
+<header><a class="brand" href="#/" lang="zh" aria-label="Menu">汉</a><button id="inv" aria-label="Swap black and white"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg></button></header>
 <main id="app"></main>
-<script src="js/store.js"></script>
-<script src="js/data.js"></script>
-<script src="js/core.js"></script>
-<script src="js/views.js"></script>
-<script src="js/tests.js"></script>
-<script src="js/learning.js"></script>
-<script src="js/adaptive.js"></script>
-<script src="js/remote.js"></script>
-<script src="js/qotd.js"></script>
-<script src="js/app.js"></script>
+<noscript>This site needs JavaScript.</noscript>
+<script>
+/* ---------- saved progress (this browser only) ---------- */
+const P=(()=>{try{return JSON.parse(localStorage.getItem("hs-prog")||"{}")}catch(e){return{}}})();
+["done","scores","qotd","exams","tb"].forEach(k=>P[k]=P[k]||{});
+const savep=()=>{try{localStorage.setItem("hs-prog",JSON.stringify(P))}catch(e){}};
+const dkey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+
+/* ---------- data ---------- */
+const LV=[
+["hsk1","HSK 1","150 words · beginner","一","你好|nǐ hǎo|hello;谢谢|xiè xie|thank you;再见|zài jiàn|goodbye;朋友|péng you|friend;学校|xué xiào|school;老师|lǎo shī|teacher;苹果|píng guǒ|apple;水|shuǐ|water;米饭|mǐ fàn|rice;喜欢|xǐ huan|to like;今天|jīn tiān|today;医院|yī yuàn|hospital;电话|diàn huà|telephone;漂亮|piào liang|pretty;猫|māo|cat"],
+["hsk2","HSK 2","300 words · elementary","二","旅游|lǚ yóu|to travel;孩子|hái zi|child;非常|fēi cháng|very;手机|shǒu jī|mobile phone;运动|yùn dòng|exercise;便宜|pián yi|cheap;咖啡|kā fēi|coffee;房间|fáng jiān|room;公司|gōng sī|company;帮助|bāng zhù|to help;告诉|gào su|to tell;觉得|jué de|to feel;眼睛|yǎn jing|eye;起床|qǐ chuáng|to get up;药|yào|medicine"],
+["hsk3","HSK 3","600 words · lower intermediate","三","比赛|bǐ sài|competition;环境|huán jìng|environment;经常|jīng cháng|often;作业|zuò yè|homework;附近|fù jìn|nearby;年轻|nián qīng|young;愿意|yuàn yì|willing;季节|jì jié|season;担心|dān xīn|to worry;世界|shì jiè|world;重要|zhòng yào|important;终于|zhōng yú|finally;声音|shēng yīn|sound;邻居|lín jū|neighbor"],
+["hsk4","HSK 4","1,200 words · intermediate","四","经验|jīng yàn|experience;压力|yā lì|pressure;结果|jié guǒ|result;复杂|fù zá|complicated;获得|huò dé|to obtain;成功|chéng gōng|success;目的|mù dì|purpose;感动|gǎn dòng|moved;禁止|jìn zhǐ|to prohibit;交流|jiāo liú|to communicate;导游|dǎo yóu|tour guide;减肥|jiǎn féi|to lose weight;误会|wù huì|misunderstanding;打印|dǎ yìn|to print"],
+["hsk5","HSK 5","2,500 words · upper intermediate","五","创造|chuàng zào|to create;道德|dào dé|morality;否则|fǒu zé|otherwise;趋势|qū shì|trend;谨慎|jǐn shèn|cautious;吸收|xī shōu|to absorb;避免|bì miǎn|to avoid;承担|chéng dān|to bear;繁荣|fán róng|prosperous;观念|guān niàn|concept;克服|kè fú|to overcome;摆脱|bǎi tuō|to break free of;贡献|gòng xiàn|contribution;合理|hé lǐ|reasonable"],
+["hsk6","HSK 6","5,000 words · advanced","六","弊端|bì duān|drawback;干预|gān yù|to intervene;渺小|miǎo xiǎo|tiny;迫不及待|pò bù jí dài|cannot wait;顽强|wán qiáng|tenacious;诚恳|chéng kěn|sincere;慷慨|kāng kǎi|generous;欣慰|xīn wèi|gratified;愧疚|kuì jiù|guilty;轻而易举|qīng ér yì jǔ|effortless;刻不容缓|kè bù róng huǎn|extremely urgent;根深蒂固|gēn shēn dì gù|deep-rooted"],
+["hsk79","HSK 7–9","one combined advanced exam","高","阐述|chǎn shù|to elaborate;凝聚|níng jù|to rally;渗透|shèn tòu|to permeate;悖论|bèi lùn|paradox;范畴|fàn chóu|category;蕴含|yùn hán|to contain;颠覆|diān fù|to overturn;辩证|biàn zhèng|dialectical;潜移默化|qián yí mò huà|subtle influence;一丝不苟|yì sī bù gǒu|meticulous;脱颖而出|tuō yǐng ér chū|to stand out;意味深长|yì wèi shēn cháng|meaningful"]
+].map(([id,name,sub,g,s])=>({id,name,sub,g,w:s.split(";").map(x=>{const[zh,py,en]=x.split("|");return{zh,py,en,lvl:name}})}));
+const MENU=[["tests","测试","Tests","Exams, practice tests and adaptive review"],["vocab","词汇","Vocab","Every HSK word, searchable"],["learning","学习","Learning","Path and textbooks"],["reading","阅读","Reading","A new text every day"],["flashcards","卡片","Flashcards",""],["wordlist","词表","Wordlist",""]];
+/* ---------- word data: loaded in full from the open-source repo, shown in our own UI ---------- */
+const DB={},PR={},FB={};
+const SRC=["https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/","https://cdn.jsdelivr.net/gh/drkameleon/complete-hsk-vocabulary@main/"];
+const parse=(d,lvl)=>d.map(e=>{const f=(e.f||e.forms||[])[0]||{},tr=f.i||f.transcriptions||{},m=f.m||f.meanings||[];
+ return{zh:e.s||e.simplified,py:tr.y||tr.pinyin||"",en:m.join("; ").split("; ").slice(0,2).join("; ").slice(0,56),lvl}}).filter(w=>w.zh&&w.py&&w.en);
+async function fetchLevel(lv){const i=LV.indexOf(lv),p=i<6?"old/"+(i+1):"new/7";
+ for(const b of SRC){try{const r=await fetch(b+"wordlists/exclusive/"+p+".min.json");if(!r.ok)continue;const w=parse(await r.json(),lv.name);if(w.length>20)return w}catch(e){}}
+ throw 0}
+const getLevel=lv=>PR[lv.id]||(PR[lv.id]=fetchLevel(lv).then(w=>DB[lv.id]=w).catch(()=>{FB[lv.id]=1;return DB[lv.id]=lv.w}));
+function ensure(lv){if(DB[lv.id])return true;const my=rt;getLevel(lv).then(()=>{if(my===rt)draw(true)});return false}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s),app=$("#app");
+const shuf=a=>[...a].sort(()=>Math.random()-.5);
+const speak=t=>{try{const u=new SpeechSynthesisUtterance(t);u.lang="zh-CN";u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}};
+const DAY=864e5,MIN=6e4,LS=[1,10],RS=[10];
+let deck={};try{deck=JSON.parse(localStorage.getItem("hs-deck")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("hs-deck",JSON.stringify(deck))}catch(e){}};
+const fmt=ms=>{const m=ms/MIN;if(m<1)return"<1m";if(m<60)return Math.round(m)+"m";if(m<1440)return Math.round(m/60)+"h";const d=ms/DAY;if(d<30)return Math.round(d)+"d";if(d<365)return(d/30).toFixed(1).replace(".0","")+"mo";return(d/365).toFixed(1)+"y"};
+const dueIn=(c,n=Date.now())=>c.due<=n?"now":"in "+fmt(c.due-n);
+
+/* ---------- Anki-style scheduler (SM-2 variant) ---------- */
+function newCard(w){return{...w,state:"new",step:0,ease:2.5,ivl:0,due:Date.now(),lapses:0,reps:0}}
+function grad(c,ivl,now){c.state="review";c.ivl=ivl;c.step=0;c.due=now+ivl*DAY}
+function sched(c0,r,now=Date.now()){const c={...c0};c.reps++;
+ if(c.state==="new"){c.state="learn";c.step=0}
+ if(c.state==="learn"||c.state==="relearn"){const relearn=c.state==="relearn",st=relearn?RS:LS;
+  if(r===1){c.step=0;c.due=now+st[0]*MIN}
+  else if(r===2){const a=st[c.step],b=st[c.step+1];c.due=now+(b?(a+b)/2:a*1.5)*MIN}
+  else if(r===3){c.step++;if(c.step>=st.length)grad(c,relearn?c.ivl:1,now);else c.due=now+st[c.step]*MIN}
+  else grad(c,relearn?c.ivl+1:4,now);
+  return c}
+ if(r===1){c.lapses++;c.ease=Math.max(1.3,c.ease-.2);c.ivl=1;c.state="relearn";c.step=0;c.due=now+RS[0]*MIN;return c}
+ if(r===2){c.ivl=Math.max(c.ivl+1,Math.round(c.ivl*1.2));c.ease=Math.max(1.3,c.ease-.15)}
+ if(r===3)c.ivl=Math.max(c.ivl+1,Math.round(c.ivl*c.ease));
+ if(r===4){c.ivl=Math.max(c.ivl+1,Math.round(c.ivl*c.ease*1.3));c.ease+=.15}
+ c.due=now+c.ivl*DAY;return c}
+function miss(w){const c=deck[w.zh];if(c){c.due=Math.min(c.due,Date.now());save();return false}deck[w.zh]=newCard(w);save();return true}
+function pickCard(){const n=Date.now(),all=Object.values(deck);
+ return all.filter(x=>x.due<=n).sort((a,b)=>a.due-b.due)[0]||all.filter(x=>x.state!=="review"&&x.due<=n+20*MIN).sort((a,b)=>a.due-b.due)[0]||null}
+
+/* ---------- views ---------- */
+const page=(h,sub,body,back)=>`<div class="page">${back?`<a class="back" href="#/${back[0]}" style="--i:0">${back[1]}</a>`:""}<h1 style="--i:1">${h}</h1>${sub?`<p class="lead" style="--i:2">${sub}</p>`:""}<div class="body">${body}</div></div>`;
+const row=(h,t,d,g,i,cls="")=>`<a class="row ${cls}" href="#/${h}" style="--i:${i}"><span><b>${t}</b><small>${d}</small></span><span class="g" lang="zh">${g}</span></a>`;
+const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2]+(i>3?'<span class="tag">soon</span>':""),m[3],m[1],i+3,"big")).join(""));
+const soon=a=>{const m=MENU.find(x=>x[0]===a);return m?page(m[2],"This section is next on the list.","",["","Menu"]):home()};
+const testsHub=()=>{const n=Date.now(),d=Object.values(deck).filter(c=>c.due<=n).length;
+ return page("Tests","Check where you stand, sit full-length exams, take longer practice sets, and drill what you keep missing.",
+ qotd()+row("tests/exams","Exams","One section for each level, HSK 1 to 9","考",3)+row("tests/practice","Practice tests","Longer sets drawn from the full word lists","练",4)+row("tests/adaptive","Adaptive",d?d+" due now":"Spaced review of the words you struggle with","适",5),["","Menu"])};
+const examList=()=>page("Exams","Full-length, timed exams in the HSK section layout. Questions rotate every 2 days (next in "+fmt((Math.floor(Date.now()/EP)+1)*EP-Date.now())+").",LV.map((l,i)=>row("tests/exam/"+l.id,l.name,SP[l.id].map(x=>x[0]+" "+x[1]).join(" + ")+", "+SP[l.id].reduce((a,x)=>a+x[2],0)+" min"+(P.exams[l.id]?", last "+P.exams[l.id].p+"%":""),l.g,i+3)).join("")+`<button class="main alt" data-a="shufall" style="margin-top:26px">Shuffle all exams now</button><p class="note" style="margin-top:20px">Questions are generated from the full HSK word lists using the official section structure. Official past papers are copyrighted and are not reproduced here.</p>`,["tests","Tests"]);
+const credit='<p class="note" style="margin-top:34px">Word data: Complete HSK Vocabulary (MIT licence). Definitions: CC-CEDICT (CC BY-SA 4.0).</p>';
+const loading=(h,b)=>page(h,"Loading the word list…","",b);
+const practiceList=()=>page("Practice tests","Thirty questions per set, drawn from the complete word list for each level. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/practice/"+l.id,l.name,l.sub+" · 30 questions",l.g,i+3)).join("")+credit,["tests","Tests"]);
+const vocabHub=()=>page("Vocab","Every HSK word, searchable and ready to send to Adaptive.",row("vocab/lists","Word lists","HSK 1 to 9, loaded in full","词",3)+credit,["","Menu"]);
+const listIndex=()=>page("Word lists","Pick a level.",LV.map((l,i)=>row("vocab/list/"+l.id,l.name,l.sub,l.g,i+3)).join("")+credit,["vocab","Vocab"]);
+let vq="",vn=60,vcur=[],vlv=null;
+function vlist(){const w=DB[vlv.id],q=vq.trim().toLowerCase();vcur=q?w.filter(x=>x.zh.includes(q)||x.py.toLowerCase().includes(q)||x.en.toLowerCase().includes(q)):w;
+ return `<p class="note">${vcur.length} word${vcur.length===1?"":"s"}</p>`+vcur.slice(0,vn).map((x,i)=>`<div class="mini"><span class="hzs" lang="zh">${x.zh}</span><span>${x.py} · ${x.en}</span><span style="grid-column:2;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" data-a="say" data-t="${x.zh}">Listen</button><button class="ghost" data-a="addw" data-i="${i}" ${deck[x.zh]?"disabled":""}>${deck[x.zh]?"In Adaptive":"Add to Adaptive"}</button></span></div>`).join("")+(vcur.length>vn?`<button class="main alt" data-a="more" style="margin-top:20px">Show more</button>`:"")}
+function listView(lv){vlv=lv;if(!ensure(lv))return loading(lv.name,["vocab/lists","Word lists"]);
+ return page(lv.name,lv.sub,(FB[lv.id]?'<p class="note">Could not reach the word-list server, so this is the small built-in starter set.</p>':"")+`<input id="q" class="search" type="search" placeholder="Search hanzi, pinyin or English" autocomplete="off" aria-label="Search words"><div id="vl">${vlist()}</div>`+credit,["vocab/lists","Word lists"])}
+
+/* exams */
+let ex=null;
+const lab=(w,t)=>t===0?w.en:t===1?w.zh:w.py;
+function mkOpts(w,t,pool,r){const seen=new Set([lab(w,t)]),o=[w];for(const x of sh(pool,r)){const k=lab(x,t);if(!seen.has(k)){seen.add(k);o.push(x);if(o.length===4)break}}return sh(o,r)}
+function startExam(lv,kind){const pool=DB[lv.id],n=kind==="practice"?30:10;
+ ex={lv,kind,qs:shuf(pool).slice(0,n).map((w,k)=>({w,t:k%3,opts:mkOpts(w,k%3,pool)})),i:0,score:0,wrong:[],added:0,picked:null,rt}}
+const exBack=()=>ex.kind==="practice"?["tests/practice","Practice tests"]:["tests/exams","Exams"];
+function question(){const q=ex.qs[ex.i],t=q.t,n=ex.qs.length,done=ex.picked!=null;
+ const prompt=t===1?`<div class="en big">${q.w.en}</div>`:`<div class="hz" lang="zh">${q.w.zh}</div>`;
+ const opts=q.opts.map((o,k)=>{let c="opt"+(t===1?" zhopt":"");if(done){if(o===q.w)c+=" ok";else if(k===ex.picked)c+=" bad"}return`<button class="${c}" data-a="pick" data-k="${k}" ${done?"disabled":""}>${lab(o,t)}</button>`}).join("");
+ const right=done&&q.opts[ex.picked]===q.w;
+ return page(ex.lv.name+(ex.kind==="practice"?" practice":""),`Question ${ex.i+1} of ${n}`,`<div class="bar"><i style="width:${ex.i/n*100}%"></i></div><p class="ask">${["What does this mean?","Which word means this?","How is this pronounced?"][t]}</p>${prompt}${t!==1?`<button class="ghost" data-a="say" data-t="${q.w.zh}">Listen</button>`:""}<div class="opts">${opts}</div>${done?`<div class="fb">${right?"Correct.":`Not quite: ${q.w.zh} is ${q.w.py}, “${q.w.en}”. Added to Adaptive.`}</div><button class="main" data-a="next">${ex.i+1<n?"Next question":"See results"}</button>`:""}`,exBack())}
+function result(){const n=ex.qs.length,b=exBack();
+ return page(ex.lv.name+(ex.kind==="practice"?" practice":"")+" result","",`<div class="score">${ex.score}/${n}</div><p class="lead">${ex.wrong.length?ex.added+" new word"+(ex.added===1?"":"s")+" added to Adaptive for review.":"Clean sweep. Nothing to add to Adaptive."}</p>`+
+ ex.wrong.map(w=>`<div class="mini"><span class="hzs" lang="zh">${w.zh}</span><span>${w.py}</span><small>${w.en}</small></div>`).join("")+
+ `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:30px"><button class="main" data-a="retry">Try again</button><button class="main alt" data-a="go" data-h="tests/adaptive">Open Adaptive</button><button class="main alt" data-a="go" data-h="${b[0]}">${b[1]}</button></div>`,b)}
+
+/* ---------- full-length exams ---------- */
+const SP={hsk1:[["Listening",20,15],["Reading",20,17]],hsk2:[["Listening",35,25],["Reading",25,22]],hsk3:[["Listening",40,35],["Reading",30,30],["Writing",10,15]],hsk4:[["Listening",45,30],["Reading",40,40],["Writing",15,25]],hsk5:[["Listening",45,30],["Reading",45,45],["Writing",10,40]],hsk6:[["Listening",50,35],["Reading",50,50],["Writing",10,45]],hsk79:[["Listening",14,20],["Reading",14,25],["Writing",13,25]]};
+const EP=2*DAY;let shc=0;try{shc=+localStorage.getItem("hs-sh")||0}catch(e){}
+const bump=()=>{shc++;try{localStorage.setItem("hs-sh",shc)}catch(e){}};
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const sh=(a,r=Math.random)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const clock=ms=>{ms=Math.max(0,Math.ceil(ms/1000));return Math.floor(ms/60)+":"+String(ms%60).padStart(2,"0")};
+let fe=null;
+function buildExam(lv){const pool=DB[lv.id],r=rng([...lv.id].reduce((h,c)=>h*31+c.charCodeAt(0)|0,7)+(Math.floor(Date.now()/EP)+shc)*1013),ws=sh(pool,r);let k=0;
+ return{lv,si:0,qi:0,done:false,on:false,end:0,added:0,secs:SP[lv.id].map(([name,n,min])=>({name,min,items:Array.from({length:n},(_,i)=>{const w=ws[k++%ws.length],m=name[0],t=m==="L"?i%2:m==="R"?i%3:1;return{w,m,t,opts:m==="W"?null:mkOpts(w,t,pool,r),ans:null}})}))}}
+const fsay=()=>{if(fe&&fe.on&&!fe.done){const q=fe.secs[fe.si].items[fe.qi];if(q.m==="L")speak(q.w.zh)}};
+function finishSec(){fe.si++;fe.qi=0;
+ if(fe.si>=fe.secs.length){fe.done=true;fe.on=false;fe.rep=fe.secs.map(s=>{let c=0;s.items.forEach(q=>{const ok=q.m==="W"?(q.ans||"").trim()===q.w.zh:q.opts[q.ans]===q.w;if(ok)c++;else if(miss(q.w))fe.added++});return{n:s.name,c,t:s.items.length}});P.exams[fe.lv.id]={p:Math.round(fe.rep.reduce((a,x)=>a+x.c,0)/fe.rep.reduce((a,x)=>a+x.t,0)*100),d:dkey()};savep()}
+ else fe.end=Date.now()+fe.secs[fe.si].min*MIN;draw(false);fsay()}
+function fintro(){const t=fe.secs.reduce((a,s)=>a+s.min,0);
+ return page(fe.lv.name+" exam","Full length and timed. You cannot go back to a section once you finish it, and answers are only revealed in the final report.",fe.secs.map(s=>`<div class="mini"><span class="hzs" style="font:400 22px var(--serif)">${s.name}</span><span>${s.items.length} questions</span><small>${s.min} minutes</small></div>`).join("")+`<p class="note" style="margin-top:16px">${t} minutes in total. Pass mark 60%. Listening plays through your device voice, so use headphones. Questions change every 2 days.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px"><button class="main" data-a="fstart">Start exam</button><button class="main alt" data-a="reshuf">Shuffle questions</button></div>`,["tests/exams","Exams"])}
+function fq(){const s=fe.secs[fe.si],q=s.items[fe.qi],n=s.items.length;let pr,ask,body;
+ if(q.m==="L"){pr=`<button class="main alt" data-a="say" data-t="${q.w.zh}">Play audio</button>`;ask=q.t===0?"Listen. What does it mean?":"Listen. Which word did you hear?"}
+ else if(q.m==="W"){pr=`<div class="en big">${q.w.en}</div><p class="note">${q.w.py}</p>`;ask="Write the word in characters."}
+ else{pr=q.t===1?`<div class="en big">${q.w.en}</div>`:`<div class="hz" lang="zh">${q.w.zh}</div>`;ask=["What does this mean?","Which word means this?","How is this pronounced?"][q.t]}
+ body=q.m==="W"?`<input id="wa" class="search" lang="zh" value="${q.ans||""}" placeholder="汉字" autocomplete="off">`:`<div class="opts">${q.opts.map((o,k)=>`<button class="opt${q.t===1?" zhopt":""}${q.ans===k?" ok":""}" data-a="fa" data-k="${k}">${lab(o,q.t)}</button>`).join("")}</div>`;
+ return page(fe.lv.name+" · "+s.name,`Question ${fe.qi+1} of ${n}`,`<div class="stats"><div><b id="tm">${clock(fe.end-Date.now())}</b>left in this section</div></div><p class="ask">${ask}</p>${pr}${body}<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">${fe.qi>0?'<button class="main alt" data-a="fprev">Previous</button>':""}${fe.qi<n-1?'<button class="main" data-a="fnext">Next</button>':""}<button class="main alt" data-a="ffin">Finish section</button></div>`,null)}
+function frep(){const c=fe.rep.reduce((a,x)=>a+x.c,0),t=fe.rep.reduce((a,x)=>a+x.t,0),p=Math.round(c/t*100);
+ return page(fe.lv.name+" report","",`<div class="score">${p}%</div><p class="lead">${p>=60?"Pass mark reached.":"Below the 60% pass mark."} ${fe.added} missed word${fe.added===1?"":"s"} added to Adaptive.</p>`+fe.rep.map(x=>`<div class="mini"><span class="hzs" style="font:400 22px var(--serif)">${x.n}</span><span>${x.c} of ${x.t} correct</span></div>`).join("")+`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:30px"><button class="main" data-a="reshuf">Shuffle and retake</button><button class="main alt" data-a="go" data-h="tests/adaptive">Open Adaptive</button><button class="main alt" data-a="go" data-h="tests/exams">All exams</button></div>`,["tests/exams","Exams"])}
+
+/* ---------- learning: path, textbooks, reader ---------- */
+const PATH=[
+{id:"pinyin",title:"Pinyin first",sub:"Week 1: the sound system",g:"音",text:"Pinyin spells Mandarin with letters you already know. Every syllable has an {{initial|The opening consonant, like m in mā or sh in shū.}} and a {{final|The vowel part that follows, like a in mā or ing in míng.}}. Learn pinyin before any character, because dictionaries, apps and textbooks all use it. Say each syllable aloud as you read: {{bā, pā, mā, fā|Same final, different initials. Listen for the puff of air in p.}}.",quiz:[["What do beginner guides say to learn first?",["Handwriting","Pinyin","News articles"],1],["In mā, which part is the initial?",["m","ā","The tone mark"],0]]},
+{id:"tones",title:"The four tones",sub:"Lock them in early",g:"调",text:"Mandarin has four tones plus a neutral tone. {{mā 妈|First tone: high and level. Means mother.}}, {{má 麻|Second tone: rising, like a question. Means hemp.}}, {{mǎ 马|Third tone: dips, then rises. Means horse.}} and {{mà 骂|Fourth tone: sharp and falling. Means to scold.}} are four different words. Hear them from a native speaker and get corrected quickly. Learning to recognise tones helps you produce them.",quiz:[["Which tone is high and level?",["First","Second","Fourth"],0],["Which syllable means horse?",["mā","mǎ","mà"],1]]},
+{id:"phrases",title:"First phrases",sub:"Speak from day one",g:"话",text:"Start speaking at once. {{你好 nǐ hǎo|Hello. Literally: you good.}} opens any conversation. {{谢谢 xiè xie|Thank you. The second syllable is neutral tone, short and light.}} and {{再见 zài jiàn|Goodbye. Literally: again see.}} finish your first set. Repeat each phrase aloud, then record yourself and compare.",quiz:[["Which phrase means thank you?",["你好","谢谢","再见"],1],["What does 再见 mean?",["Hello","Sorry","Goodbye"],2]]},
+{id:"characters",title:"Characters and review",sub:"Recognise first, write later",g:"字",text:"Begin with recognition, not handwriting, and learn the most frequent characters first: {{about 1,000 characters cover roughly 90% of everyday text|A frequency fact repeated in beginner guides. It is why common characters come first.}}. Review them with {{spaced repetition|Hard cards return sooner and easy ones return after days or months. This is what the Adaptive tab does.}}, then read short texts in the Reading tab.",quiz:[["Which characters should you learn first?",["Rare ones","The most frequent","Only your name"],1],["What does spaced repetition do?",["Shows hard cards sooner","Hides every card","Repeats at random"],0]]}];
+const TB=[{id:"wb",title:"Chinese (Mandarin)",sub:"Wikibooks open textbook (CC BY-SA). Pronunciation, vocabulary, then 16 lessons in order.",g:"书"}];
+const SAMPLE="今天北京的天气很好。很多人去公园运动，也有人在学校附近喝茶。地铁公司说，明天会有更多的车。";
+let D=null,chat=[],qz=null,tbOpen=false,LEX=null;
+const lexAll=()=>Promise.all(LV.slice(0,6).map(getLevel)).then(()=>{if(!LEX){LEX=new Map();LV.slice(0,6).forEach(l=>DB[l.id].forEach(w=>{if(!LEX.has(w.zh))LEX.set(w.zh,w)}))}});
+function openDoc(d){D=d;if(!d.auto){d.notes=[];d.html=d.text.replace(/\{\{(.+?)\|(.+?)\}\}/g,(m,t,n)=>`<mark data-a="note" data-i="${d.notes.push({t,n})-1}">${t}</mark>`);d.plain=d.text.replace(/\{\{(.+?)\|.+?\}\}/g,"$1")}
+ chat=[];const pool=LEX?[...LEX.values()]:[];
+ qz={i:0,s:0,p:null,items:d.auto?sh([...new Set(d.hits)]).slice(0,5).map(w=>{const o=mkOpts(w,0,pool);return{q:`What does ${w.zh} (${w.py}) mean?`,o:o.map(x=>x.en),a:o.indexOf(w)}}):d.quiz.map(([q,o,a])=>({q,o,a}))}}
+const chatH=()=>chat.map(m=>`<p><b>${m.r==="user"?"You":"Tutor"}:</b> ${m.t.replace(/</g,"&lt;")}</p>`).join("")||'<p class="note">Ask anything about this text.</p>';
+async function ask(){let k="";try{k=localStorage.getItem("hs-key")||""}catch(e){}
+ if(!k)return"Tap Set API key and paste an Anthropic API key to turn the assistant on.";
+ try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-5-5",max_tokens:400,system:"You are a patient Mandarin tutor for a beginner. Be brief and concrete. The learner is reading this text:\n"+D.plain,messages:chat.map(m=>({role:m.r,content:m.t}))})});
+  const j=await r.json();return(j.content&&j.content[0]&&j.content[0].text)||(j.error&&j.error.message)||"No reply."}catch(e){return"Could not reach the assistant."}}
+function lh(){const z=qz;if(!z.items.length)return'<p class="note">No highlighted words yet. Paste text that contains HSK 1 to 6 vocabulary.</p>';
+ if(z.i>=z.items.length)return`<div class="score" style="font-size:72px">${z.s}/${z.items.length}</div><div style="display:flex;gap:10px;flex-wrap:wrap">${D.auto?'<button class="main" data-a="addall">Add these words to Adaptive</button>':""}<button class="main alt" data-a="qre">Try again</button></div>`;
+ const q=z.items[z.i],d=z.p!=null;
+ return`<p class="ask">Question ${z.i+1} of ${z.items.length}</p><p style="font-size:20px">${q.q}</p><div class="opts">${q.o.map((o,k)=>`<button class="opt${d?(k===q.a?" ok":k===z.p?" bad":""):""}" data-a="qa" data-k="${k}" ${d?"disabled":""}>${o}</button>`).join("")}</div>${d?'<button class="main" data-a="qn">Next</button>':""}`}
+function docView(back){return page(D.title,D.sub,`<div class="reader"><div class="rtext${D.auto?" zh":""}${/^wb\//.test(D.id||"")?" wiki":""}">${D.html}</div><aside class="chat"><b>Reader assistant</b><div class="cl" id="cl">${chatH()}</div><input id="ci" class="search" placeholder="Ask about this text" autocomplete="off" aria-label="Ask the assistant"><div style="display:flex;gap:8px"><button class="ghost" data-a="send">Ask</button><button class="ghost" data-a="key">Set API key</button></div></aside></div><h2>Lesson helper</h2><div id="lh">${lh()}</div>${/^rd\//.test(D.id||"")?'<button class="link" data-a="rclose">Choose another text</button>':""}<div id="pop"></div>`,back)}
+const pop=h=>{const p=$("#pop");p.innerHTML=h+'<button class="ghost" data-a="closep">Close</button>';p.style.display="block"};
+let pw=null;
+const learnHub=()=>page("Learning","Start with the path, then study alongside a textbook.",row("learning/path","Path","Four steps for a complete beginner","路",3)+row("learning/textbooks","Textbooks","Pick a book and study its pages","书",4),["","Menu"]);
+const pathList=()=>page("Path","Pinyin, then tones, then phrases, then characters: the order beginner guides agree on.",PATH.map((l,i)=>row("learning/path/"+l.id,l.title,l.sub+(P.done[l.id]?", done":""),l.g,i+3)).join(""),["learning","Learning"]);
+
+/* adaptive */
+let cur=null,shown=false;
+function adaptive(){const n=Date.now(),all=Object.values(deck);if(!cur||!deck[cur.zh])cur=pickCard();
+ const due=all.filter(c=>c.due<=n).length,lrn=all.filter(c=>c.state!=="review").length,mat=all.filter(c=>c.state==="review"&&c.ivl>=21).length;
+ let main;
+ if(cur){main=`<div class="card"><div class="hz" lang="zh">${cur.zh}</div>${shown?`<div class="py">${cur.py}</div><p class="en" style="margin:4px 0 12px;font-size:20px">${cur.en}</p>`:`<div class="hint">Recall the meaning and the pronunciation</div>`}<button class="ghost" data-a="say" data-t="${cur.zh}">Listen</button></div>`+
+  (shown?`<div class="rate">${["Again","Hard","Good","Easy"].map((l,i)=>`<button data-a="rate" data-r="${i+1}"><b>${l}</b><span>${fmt(sched(cur,i+1).due-n)}</span></button>`).join("")}</div>`:`<button class="main" data-a="show" style="margin-bottom:34px">Show answer</button>`)}
+ else if(all.length){const nx=all.reduce((a,b)=>a.due<b.due?a:b);main=`<div class="card"><div class="hz" style="font-size:56px">✓</div><p class="note" style="margin:0 auto">All caught up. Next card ${dueIn(nx,n)}.</p></div>`}
+ else main=`<div class="card"><p class="note" style="margin:0 auto">Nothing here yet. Words you miss in an exam land here automatically, or add 20 words from a level below.</p></div>`;
+ const work=all.filter(c=>c.state!=="review"||c.ivl<21).sort((a,b)=>a.due-b.due).slice(0,20);
+ const lbl={new:"new",learn:"learning",relearn:"relearning",review:"young"};
+ return page("Adaptive","Scheduled the way Anki does it: hard words return within minutes, easy ones drift out to days and months.",
+ `<div class="stats"><div><b>${due}</b>due now</div><div><b>${lrn}</b>learning</div><div><b>${mat}</b>mature</div><div><b>${all.length}</b>total</div></div>${main}`+
+ (work.length?`<h2>Working on</h2>`+work.map(c=>`<div class="mini"><span class="hzs" lang="zh">${c.zh}</span><span>${c.py} · ${c.en}</span><small>${lbl[c.state]} · ease ${Math.round(c.ease*100)}%${c.lapses?" · lapses "+c.lapses:""}</small><small class="r" style="grid-column:2">${dueIn(c,n)}</small></div>`).join(""):"")+
+ `<h2>Add 20 words from a level</h2><div class="seed">${LV.map(l=>`<button class="ghost" data-a="seed" data-l="${l.id}">${l.name}</button>`).join("")}</div>${all.length?`<button class="link" data-a="reset">Reset Adaptive</button>`:""}`,["tests","Tests"])}
+
+/* ---------- open-licence sources, loaded live and shown in our own reader ---------- */
+const WB="https://en.wikibooks.org/w/api.php",WP="https://zh.wikipedia.org/api/rest_v1/feed/featured/";
+const R={},jget=u=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json()});
+const esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const failed=k=>R[k]&&R[k].e;
+function need(k,loader){if(R[k]&&R[k].v!==undefined)return R[k].v;if(!R[k]){R[k]={};const my=rt;R[k].p=loader().then(v=>R[k].v=v).catch(()=>R[k].e=1).then(()=>{if(my===rt)draw(true)})}}
+const OK=new Set("p ul ol li table thead tbody tr td th h1 h2 h3 h4 h5 h6 b strong i em br dl dt dd blockquote div span".split(" "));
+function clean(n){[...n.childNodes].forEach(c=>{if(c.nodeType===3)return;if(c.nodeType!==1){c.remove();return}const t=c.tagName.toLowerCase(),k=typeof c.className==="string"?c.className:"";
+ if(/^(script|style|sup|img|figure|audio|video|svg|noscript)$/.test(t)||c.id==="toc"||/(^|\s)(mw-editsection|navbox|toc|noprint|thumb|reference|metadata|mbox)/.test(k)){c.remove();return}
+ clean(c);if(!OK.has(t)){c.replaceWith(...c.childNodes);return}[...c.attributes].forEach(a=>c.removeAttribute(a.name))})}
+/* one pipeline for textbook pages and reading texts: bold terms and linked concepts become notes, HSK words become tappable */
+function buildDoc(id,title,sub,html,concepts={}){const doc=new DOMParser().parseFromString("<body>"+html,"text/html").body;clean(doc);
+ const hits=[],notes=[],terms=Object.keys(concepts).filter(t=>t.length>1).sort((a,b)=>b.length-a.length);
+ doc.querySelectorAll("b,strong").forEach(b=>{const t=b.textContent.trim();if(!t)return;const blk=b.closest("p,li,td,dd,div")||b.parentNode,m=document.createElement("mark");m.dataset.a="note";m.dataset.i=notes.push({t,n:blk.textContent.replace(/\s+/g," ").trim().slice(0,220)})-1;m.textContent=t;b.replaceWith(m)});
+ const tw=document.createTreeWalker(doc,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);
+ ns.forEach(nd=>{if(nd.parentNode.closest("mark"))return;const x=nd.nodeValue;let h="";
+  for(let i=0;i<x.length;){let hit=false;for(const t of terms){if(x.startsWith(t,i)){h+=`<mark data-a="note" data-i="${notes.push({t,n:concepts[t]})-1}">${t}</mark>`;i+=t.length;hit=true;break}}
+   if(hit)continue;let m=null;for(let l=Math.min(4,x.length-i);l>0;l--){const w=LEX.get(x.substr(i,l));if(w){m=w;break}}
+   if(m){h+=`<mark data-a="hit" data-i="${hits.push(m)-1}">${m.zh}</mark>`;i+=m.zh.length}else h+=esc(x[i++])}
+  const tp=document.createElement("template");tp.innerHTML=h;nd.replaceWith(tp.content)});
+ return{id,title,sub,auto:true,hits,notes,html:doc.innerHTML,plain:doc.textContent.replace(/\s+/g," ").slice(0,1500)}}
+const wbc='<p class="note" style="margin-top:30px">Text: Wikibooks, “Chinese (Mandarin)”, licensed CC BY-SA. Pages load live and are highlighted by this app.</p>';
+const tbPicker=()=>page("Textbooks","Choose a book. Its pages open here, highlighted with HSK vocabulary and key terms, and your place is saved.",`<button class="main" data-a="tbm" aria-expanded="${tbOpen}">Choose your textbook ${tbOpen?"▴":"▾"}</button>`+(tbOpen?`<div style="margin-top:14px">${TB.map((t,i)=>row("learning/textbooks/"+t.id,t.title,t.sub,t.g,i)).join("")}</div>`:"")+(P.tb.last?`<div style="margin-top:22px">${row("learning/textbooks/"+P.tb.last,"Continue where you left off",P.tb.lastT||"","续",1)}</div>`:"")+wbc,["learning","Learning"]);
+async function tocWB(){const SKIP=/Planning|Contributors|How To Use|Print|Template|Talk|Cover|Special:|Category:|Traditional/i,seen=new Set(),t=[],P0="Chinese (Mandarin)/";
+ const add=(ti,label)=>{if(ti.startsWith(P0)&&!seen.has(ti)&&!SKIP.test(ti)){seen.add(ti);t.push({title:ti,label:label||ti.slice(P0.length)})}};
+ try{const j=await jget(WB+"?action=parse&page="+encodeURIComponent("Chinese (Mandarin)")+"&prop=text&redirects=1&disableeditsection=1&format=json&origin=*");
+  new DOMParser().parseFromString(j.parse.text["*"],"text/html").querySelectorAll("a[href]").forEach(a=>{let h=a.getAttribute("href");if(!h.startsWith("/wiki/"))return;try{h=decodeURIComponent(h.slice(6).split("#")[0]).replace(/_/g," ")}catch(e){return}add(h,a.textContent.trim())})}catch(e){}
+ if(t.length)return t;
+ let c="";do{const j=await jget(WB+"?action=query&list=allpages&apprefix="+encodeURIComponent(P0)+"&aplimit=500&format=json&origin=*"+c);j.query.allpages.forEach(p=>add(p.title));c=j.continue?"&apcontinue="+encodeURIComponent(j.continue.apcontinue):""}while(c);
+ const rk=s=>{const m=s.match(/Lesson\s*(\d+)/i);return /pronunc/i.test(s)?0:/vocab/i.test(s)?1:m?2+ +m[1]/100:9};
+ if(!t.length)throw 0;return t.sort((a,b)=>rk(a.title)-rk(b.title)||a.title.localeCompare(b.title,undefined,{numeric:true}))}
+const tbBack=["learning/textbooks","Textbooks"];
+function wbToc(){const t=need("wbtoc",tocWB);if(!t)return page("Chinese (Mandarin)",failed("wbtoc")?"Could not reach Wikibooks. Check your connection and reload.":"Loading the table of contents…","",tbBack);
+ return page("Chinese (Mandarin)","Pronunciation and vocabulary first, then the lessons in order. Progress is saved.",(P.tb.last?row("learning/textbooks/"+P.tb.last,"Continue",P.tb.lastT||"","续",2):"")+t.map((x,i)=>row("learning/textbooks/wb/"+i,x.label,P.done["wb/"+i]?"Quiz completed":"","文",i+3)).join("")+wbc,tbBack)}
+function wbPage(i){const back=["learning/textbooks/wb","Contents"],t=need("wbtoc",tocWB);if(!t)return page("Chinese (Mandarin)",failed("wbtoc")?"Could not reach Wikibooks.":"Loading…","",back);
+ const it=t[i];if(!it)return learnHub();
+ const r=need("wbp"+i,()=>lexAll().then(()=>jget(WB+"?action=parse&page="+encodeURIComponent(it.title)+"&prop=text&redirects=1&disableeditsection=1&disabletoc=1&format=json&origin=*")).then(j=>buildDoc("wb/"+i,it.label,"Wikibooks, CC BY-SA. Underlined: HSK words and the book's bold key terms.",j.parse.text["*"])));
+ if(!r)return page(it.label,failed("wbp"+i)?"Could not load this page.":"Loading the page…","",back);
+ if(D!==r){openDoc(r);P.tb.last="wb/"+i;P.tb.lastT=it.label;savep()}
+ return docView(back)+`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">${i>0?`<a class="main alt" style="display:inline-block;text-decoration:none" href="#/learning/textbooks/wb/${i-1}">Previous page</a>`:""}${i<t.length-1?`<a class="main" style="display:inline-block;text-decoration:none" href="#/learning/textbooks/wb/${i+1}">Next page</a>`:""}</div>`}
+/* reading: a fresh set of texts every day from Chinese Wikipedia's daily feed */
+const rdTabs=[["news","News"],["tfa","Article of the day"],["otd","On this day"],["own","Your own text"]];
+let rdTab="news",rdItems=[];
+const fday=o=>{const d=new Date(Date.now()-o*DAY);return d.getUTCFullYear()+"/"+String(d.getUTCMonth()+1).padStart(2,"0")+"/"+String(d.getUTCDate()).padStart(2,"0")};
+const feed=()=>jget(WP+fday(0)).catch(()=>jget(WP+fday(1)));
+const txt=h=>new DOMParser().parseFromString(h,"text/html").body.textContent.replace(/\s+/g," ").trim();
+const cmap=ls=>Object.fromEntries((ls||[]).filter(l=>(l.normalizedtitle||l.title)&&l.extract).map(l=>[(l.normalizedtitle||l.title).replace(/_/g," "),l.extract.slice(0,200)]));
+function rditems(f,tab){
+ if(tab==="news")return(f.news||[]).map((n,i)=>({k:"news"+i,title:txt(n.story).slice(0,30),body:txt(n.story),c:cmap(n.links)}));
+ if(tab==="tfa")return f.tfa?[{k:"tfa",title:(f.tfa.titles&&f.tfa.titles.normalized)||f.tfa.title,body:f.tfa.extract||"",c:{}}]:[];
+ return(f.onthisday||[]).slice(0,12).map((o,i)=>({k:"otd"+i,title:o.year+"年",body:o.year+"年，"+o.text,c:cmap(o.pages)}))}
+function readingView(){if(D)return docView(null);
+ const tabs=`<div class="chips">${rdTabs.map(t=>`<button class="ghost" data-a="rtab" data-k="${t[0]}" aria-pressed="${t[0]===rdTab}">${t[1]}</button>`).join("")}</div>`;let body;
+ if(rdTab==="own")body=`<textarea id="rt" class="search" rows="7" style="border-radius:22px;resize:vertical" lang="zh" placeholder="Paste Chinese text here"></textarea><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="main" data-a="rgo">Study this text</button><button class="main alt" data-a="rsample">Use a sample passage</button></div>`;
+ else{const f=need("feed"+dkey(),feed);if(!f)body=`<p class="note">${failed("feed"+dkey())?"Could not reach today's feed. Use “Your own text” in the meantime.":"Loading today's texts…"}</p>`;
+  else{rdItems=rditems(f,rdTab);body=rdItems.length?rdItems.map((x,i)=>`<button class="row" data-a="ropen" data-i="${i}" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;font:inherit;color:inherit;cursor:pointer;--i:${i}"><span><b>${x.title}</b><small>${P.done["rd/"+x.k+dkey()]?"Quiz completed. ":""}${x.body.slice(0,60)}…</small></span><span class="g" lang="zh">读</span></button>`).join(""):'<p class="note">Nothing in this category today.</p>'}}
+ return page("Reading","A new set of texts every day from Chinese Wikipedia (CC BY-SA). Tap a word for its meaning, key concepts are underlined, and the lesson helper quizzes you on the text. Some items may appear in traditional characters.",tabs+body,["","Menu"])}
+
+/* ---------- question of the day + monthly calendar ---------- */
+let qm=0;
+function qd(){const dk=dkey(),t0=new Date(),n=Math.floor(Date.UTC(t0.getFullYear(),t0.getMonth(),t0.getDate())/DAY),lv=LV[n%6];if(!ensure(lv))return null;
+ const pool=DB[lv.id],r=rng([...dk].reduce((h,c)=>h*31+c.charCodeAt(0)|0,11)),w=pool[Math.floor(r()*pool.length)],t=n%3;return{dk,lv,w,t,o:mkOpts(w,t,pool,r)}}
+function cal(){const d=new Date(),m=new Date(d.getFullYear(),d.getMonth()+qm,1),y=m.getFullYear(),mo=m.getMonth(),pre=y+"-"+String(mo+1).padStart(2,"0"),days=new Date(y,mo+1,0).getDate(),today=dkey();let c="";
+ for(let i=0;i<m.getDay();i++)c+="<i></i>";
+ for(let i=1;i<=days;i++){const k=pre+"-"+String(i).padStart(2,"0");c+=`<b class="day${P.qotd[k]?" done":""}${k===today?" today":""}">${i}</b>`}
+ const n=Object.keys(P.qotd).filter(k=>k.startsWith(pre)).length;
+ return`<div class="calh"><button class="ghost" data-a="qprev" aria-label="Previous month">‹</button><span>${m.toLocaleDateString(undefined,{month:"long",year:"numeric"})}: ${n} day${n===1?"":"s"} done</span><button class="ghost" data-a="qnext" aria-label="Next month">›</button></div><div class="cgrid">${["S","M","T","W","T","F","S"].map(x=>`<em>${x}</em>`).join("")}${c}</div>`}
+function qotd(){const q=qd();if(!q)return'<div class="qbox"><p class="note">Loading today\'s question…</p></div>';
+ const{dk,lv,w,t,o}=q,a=P.qotd[dk],ask=t===0?`What does ${w.zh} mean?`:t===1?`Which word means “${w.en}”?`:`How is ${w.zh} pronounced?`;
+ return`<div class="qbox"><p class="ask">Question of the day · ${lv.name}</p><p style="font-size:22px;margin:4px 0 14px">${ask}</p><div class="opts">${o.map((x,k)=>`<button class="opt${t===1?" zhopt":""}${a?(x===w?" ok":k===a.k?" bad":""):""}" data-a="qq" data-k="${k}" ${a?"disabled":""}>${lab(x,t)}</button>`).join("")}</div>${a?`<p class="fb">${a.ok?"Correct.":`Not quite: ${w.zh} is ${w.py}, “${w.en}”. Added to Adaptive.`}</p>`+cal():'<p class="note">Answer to see your calendar.</p>'}</div>`}
+
+/* ---------- router + events ---------- */
+let view=home;
+function draw(anim){app.classList.toggle("still",!anim);app.innerHTML=view()}
+let rt=0;
+function route(){const[a,b,c,d]=location.hash.replace(/^#\/?/,"").split("/").filter(Boolean);cur=null;shown=false;vq="";vn=60;rt++;fe=null;D=null;pw=null;tbOpen=false;const lv=LV.find(l=>l.id===c);
+ if(!a)view=home;
+ else if(a==="tests"&&!b)view=testsHub;
+ else if(a==="tests"&&b==="exams")view=examList;
+ else if(a==="tests"&&b==="practice"&&!c)view=practiceList;
+ else if(a==="tests"&&b==="exam"&&lv)view=()=>{if(!ensure(lv))return loading(lv.name,["tests/exams","Exams"]);if(!fe||fe.lv!==lv)fe=buildExam(lv);return fe.done?frep():fe.on?fq():fintro()};
+ else if(a==="tests"&&b==="practice"&&lv)view=()=>{const k=b==="exam"?"exam":"practice";
+  if(!ensure(lv))return loading(lv.name,k==="exam"?["tests/exams","Exams"]:["tests/practice","Practice tests"]);
+  if(!ex||ex.rt!==rt)startExam(lv,k);return ex.i>=ex.qs.length?result():question()};
+ else if(a==="tests"&&b==="adaptive")view=adaptive;
+ else if(a==="vocab"&&!b)view=vocabHub;
+ else if(a==="vocab"&&b==="lists"&&!c)view=listIndex;
+ else if(a==="vocab"&&b==="list"&&lv)view=()=>listView(lv);
+ else if(a==="learning"&&!b)view=learnHub;
+ else if(a==="learning"&&b==="path"&&!c)view=pathList;
+ else if(a==="learning"&&b==="path"&&PATH.some(x=>x.id===c)){const d=PATH.find(x=>x.id===c);view=()=>{if(D!==d)openDoc(d);return docView(["learning/path","Path"])}}
+ else if(a==="learning"&&b==="textbooks"&&!c)view=tbPicker;
+ else if(a==="learning"&&b==="textbooks"&&c==="wb"&&!d)view=wbToc;
+ else if(a==="learning"&&b==="textbooks"&&c==="wb")view=()=>wbPage(+d);
+ else if(a==="reading")view=readingView;
+ else view=()=>soon(a);
+ scrollTo(0,0);draw(true)}
+app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
+ if(a==="say")speak(b.dataset.t);
+ else if(a==="pick"&&ex.picked==null){const q=ex.qs[ex.i];ex.picked=+b.dataset.k;if(q.opts[ex.picked]===q.w)ex.score++;else{ex.wrong.push(q.w);if(miss(q.w))ex.added++}draw(false)}
+ else if(a==="next"){ex.i++;ex.picked=null;draw(ex.i>=ex.qs.length)}
+ else if(a==="retry"){startExam(ex.lv,ex.kind);draw(true)}
+ else if(a==="go")location.hash="#/"+b.dataset.h;
+ else if(a==="show"){shown=true;speak(cur.zh);draw(false)}
+ else if(a==="rate"){deck[cur.zh]=sched(cur,+b.dataset.r);save();cur=null;shown=false;draw(false)}
+ else if(a==="seed"){const lv=LV.find(l=>l.id===b.dataset.l);b.textContent="Adding…";getLevel(lv).then(w=>{shuf(w.filter(x=>!deck[x.zh])).slice(0,20).forEach(x=>deck[x.zh]=newCard(x));save();if(location.hash==="#/tests/adaptive")draw(false)})}
+ else if(a==="shufall"){bump();draw(false)}
+ else if(a==="reshuf"){const lv=fe.lv;bump();fe=buildExam(lv);draw(true)}
+ else if(a==="fstart"){fe.on=true;fe.end=Date.now()+fe.secs[0].min*MIN;draw(true);fsay()}
+ else if(a==="fa"){fe.secs[fe.si].items[fe.qi].ans=+b.dataset.k;draw(false)}
+ else if(a==="fprev"){fe.qi--;draw(false);fsay()}
+ else if(a==="fnext"){fe.qi++;draw(false);fsay()}
+ else if(a==="ffin"){if(confirm("Finish this section? You cannot return to it."))finishSec()}
+ else if(a==="tbm"){tbOpen=!tbOpen;draw(false)}
+ else if(a==="note")pop(`<b>${D.notes[+b.dataset.i].t}</b><p>${D.notes[+b.dataset.i].n}</p>`)
+ else if(a==="hit"){pw=D.hits[+b.dataset.i];pop(`<b lang="zh" style="font:700 26px var(--hz)">${pw.zh}</b><p>${pw.py}<br>${pw.en}</p><button class="ghost" data-a="say" data-t="${pw.zh}">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button> `)}
+ else if(a==="addp"){if(pw&&!deck[pw.zh]){deck[pw.zh]=newCard(pw);save()}b.textContent="Added";b.disabled=true}
+ else if(a==="closep")$("#pop").style.display="none"
+ else if(a==="send"){const i=$("#ci"),v=i.value.trim();if(!v)return;chat.push({r:"user",t:v});i.value="";$("#cl").innerHTML=chatH();ask().then(t=>{chat.push({r:"assistant",t});$("#cl").innerHTML=chatH()})}
+ else if(a==="key"){const k=prompt("Paste your Anthropic API key. It is stored only in this browser.");if(k)try{localStorage.setItem("hs-key",k.trim())}catch(e){}}
+ else if(a==="qa"){const q=qz.items[qz.i];if(qz.p==null){qz.p=+b.dataset.k;if(qz.p===q.a)qz.s++}$("#lh").innerHTML=lh()}
+ else if(a==="qn"){qz.i++;qz.p=null;if(qz.i>=qz.items.length&&D.id){P.scores[D.id]={s:qz.s,n:qz.items.length};P.done[D.id]=1;savep()}$("#lh").innerHTML=lh()}
+ else if(a==="qq"){const q=qd();if(!q||P.qotd[q.dk])return;const ok=q.o[+b.dataset.k]===q.w;P.qotd[q.dk]={k:+b.dataset.k,ok};if(!ok)miss(q.w);savep();draw(false)}
+ else if(a==="qprev"){qm--;draw(false)}
+ else if(a==="qnext"){qm++;draw(false)}
+ else if(a==="rtab"){rdTab=b.dataset.k;draw(false)}
+ else if(a==="ropen"){const it=rdItems[+b.dataset.i];lexAll().then(()=>{openDoc(buildDoc("rd/"+it.k+dkey(),it.title,"Chinese Wikipedia (CC BY-SA), "+dkey()+". Underlined: key concepts and HSK words.",esc(it.body),it.c));draw(true)})}
+ else if(a==="qre"){qz.i=0;qz.s=0;qz.p=null;$("#lh").innerHTML=lh()}
+ else if(a==="addall"){D.hits.forEach(w=>{if(!deck[w.zh])deck[w.zh]=newCard(w)});save();b.textContent="Added"}
+ else if(a==="rsample")$("#rt").value=SAMPLE
+ else if(a==="rgo"){const t=$("#rt").value;if(!t.trim())return;b.textContent="Loading word lists…";lexAll().then(()=>{openDoc(buildDoc("rd/own","Your text","Underlined: HSK words. Tap one to study it.",esc(t).replace(/\n/g,"<br>")));draw(true)})}
+ else if(a==="rclose"){D=null;draw(true)}
+ else if(a==="more"){vn+=60;$("#vl").innerHTML=vlist()}
+ else if(a==="addw"){const x=vcur[+b.dataset.i];if(x&&!deck[x.zh]){deck[x.zh]=newCard(x);save()}$("#vl").innerHTML=vlist()}
+ else if(a==="reset"&&confirm("Clear everything in Adaptive?")){deck={};save();cur=null;shown=false;draw(false)}});
+addEventListener("hashchange",route);
+setInterval(()=>{if(fe&&fe.on&&!fe.done){const l=fe.end-Date.now();if(l<=0)finishSec();else{const e=$("#tm");if(e)e.textContent=clock(l)}}},1000);
+app.addEventListener("input",e=>{if(e.target.id==="wa")fe.secs[fe.si].items[fe.qi].ans=e.target.value;if(e.target.id==="q"){vq=e.target.value;vn=60;$("#vl").innerHTML=vlist()}});
+setInterval(()=>{if(location.hash==="#/tests/adaptive"&&!cur&&!shown)draw(false)},15000);
+
+/* ---------- theme + flowing background ---------- */
+const root=document.documentElement,cv=$("#bg"),cx=cv.getContext("2d");let W,H,t=0,rgb="255,255,255";
+const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
+function setTheme(th){root.dataset.theme=th;try{localStorage.setItem("hs-theme",th)}catch(e){}rgb=th==="light"?"0,0,0":"255,255,255";if(still)frame()}
+$("#inv").onclick=()=>setTheme(root.dataset.theme==="light"?"dark":"light");
+function size(){const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);if(still)frame()}
+function frame(){cx.clearRect(0,0,W,H);const N=24;
+ for(let i=0;i<N;i++){cx.beginPath();const y0=H*(i+1)/(N+1),a=26+i*2.2;
+  for(let x=0;x<=W+10;x+=10){const y=y0+Math.sin(x*.0045+t*.5+i*.32)*a+Math.sin(x*.011-t*.35+i*.2)*a*.35;x?cx.lineTo(x,y):cx.moveTo(x,y)}
+  cx.strokeStyle=`rgba(${rgb},${.05+.09*i/N})`;cx.lineWidth=1;cx.stroke()}
+ t+=.012}
+function loop(){frame();requestAnimationFrame(loop)}
+addEventListener("resize",size);
+let saved=null;try{saved=localStorage.getItem("hs-theme")}catch(e){}
+setTheme(saved||"dark");size();if(!still)loop();route();
+
+</script>
 </body>
 </html>
