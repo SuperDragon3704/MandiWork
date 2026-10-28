@@ -106,6 +106,20 @@ mark:hover{background:var(--ink);color:var(--bg)}
 .day.done{background:#2ecc71;color:#000;border-color:#2ecc71;font-weight:700}
 .day.today{outline:2px solid var(--ink);outline-offset:1px}
 .qbox{border:1px solid var(--line);border-radius:28px;padding:22px;margin-bottom:26px;background:rgba(var(--rgb),.03)}
+
+/* refreshed study UI */
+header,main{max-width:1180px}.reader{grid-template-columns:minmax(0,1fr) 278px;gap:30px}.rtext{font-size:25px;line-height:1.95}.rtext.zh{font-size:27px;line-height:2}
+.reader-topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px;color:var(--mut);font:12px var(--sans);letter-spacing:.12em;text-transform:uppercase}.reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.chapter-nav{display:flex;align-items:center;gap:8px;color:var(--mut);letter-spacing:0;text-transform:none;font-size:14px}.chapter-nav select{max-width:min(65vw,310px);padding:9px 32px 9px 12px;border-radius:20px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.source-link{color:var(--mut);text-decoration:underline;text-underline-offset:3px;letter-spacing:0;text-transform:none;font-size:13px}.assistant-tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px}.assistant-tabs button{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:18px;background:none;color:var(--mut);font:inherit;font-size:13px;cursor:pointer}.assistant-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chat{position:sticky;top:18px;min-width:0}.cl{max-height:190px}.quiz-compact .opts{gap:6px;margin:10px 0}.quiz-compact .opt{font-size:14px;padding:9px 12px}.quiz-compact .score{font-size:52px}.quiz-compact .main{padding:9px 14px;font-size:14px}.reader .rtext h2,.reader .rtext h3{font-size:1.35em}
+#pop{display:none;position:fixed;left:16px;top:16px;right:auto;bottom:auto;width:min(320px,calc(100vw - 32px));max-height:min(46vh,340px);overflow:auto;background:var(--bg);border:1px solid var(--ink);border-radius:18px;padding:15px 16px;z-index:20;box-shadow:0 14px 44px rgba(0,0,0,.25)}#pop p{margin:6px 0 10px}
+.vocab-entry{display:grid;grid-template-columns:116px minmax(0,1fr);gap:6px 16px;align-items:center;padding:15px 4px;border-bottom:1px solid var(--line)}.vocab-entry .vocab-word{grid-row:span 2;align-self:stretch;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;min-width:0;border:0;background:none;color:var(--ink);cursor:pointer;padding:7px 4px;border-radius:16px}.vocab-entry .vocab-word:hover{background:rgba(var(--rgb),.06)}.vocab-entry .hzs{font:700 27px/1.25 var(--hz)}.vocab-entry .doodle-svg{width:88px;height:62px;display:block;overflow:visible;color:var(--ink)}.vocab-entry .word-def{font-size:16px;overflow-wrap:anywhere}.vocab-entry .word-py{font-size:14px;color:var(--mut);margin-top:2px}.vocab-entry .word-actions{grid-column:2;display:flex;gap:7px;flex-wrap:wrap}
+.doodle-svg path,.doodle-svg circle,.doodle-svg ellipse,.doodle-svg line,.doodle-svg rect,.doodle-svg polyline{stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.flashcard-shell{max-width:720px;margin:0 auto}.flashcard-face{position:relative;width:100%;min-height:310px;padding:30px 22px;border:1px solid var(--line);border-radius:30px;background:rgba(var(--rgb),.035);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center}.flashcard-face:hover{border-color:var(--ink)}.flashcard-label,.flashcard-meta{font-size:13px;color:var(--mut);letter-spacing:.1em;text-transform:uppercase}.flashcard-face .hz{margin:8px 0;font-size:clamp(70px,16vw,112px)}.flashcard-face .py{font:400 31px var(--serif)}.flashcard-face .en{font:400 clamp(24px,4vw,34px)/1.25 var(--serif);max-width:30ch}.flashcard-meta{text-align:center;margin:16px 0 18px}.flashcard-feedback{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}.flashcard-feedback .ghost{min-width:130px;padding:10px 15px}.flashcard-difficulty{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 auto 24px}.flashcard-difficulty button{padding:8px 15px;border-radius:20px;font-size:13px}
+.welcome-panel{max-width:650px;border:1px solid var(--line);border-radius:28px;padding:26px;margin:12px 0 20px}.welcome-glyph{font:700 54px/1.2 var(--hz);margin-bottom:8px}.welcome-stats{display:flex;gap:22px;flex-wrap:wrap;margin:18px 0}.welcome-stats b{display:block;font:400 34px/1 var(--serif)}
+@media(max-width:820px){header,main{max-width:100%}.reader{grid-template-columns:1fr;gap:18px}.chat{position:static}.rtext{font-size:23px}.rtext.zh{font-size:25px}.vocab-entry{grid-template-columns:98px minmax(0,1fr);gap:6px 12px}.vocab-entry .doodle-svg{width:74px}.flashcard-face{min-height:265px}}
+@media(max-width:420px){.vocab-entry{grid-template-columns:84px minmax(0,1fr);gap:5px 9px}.vocab-entry .hzs{font-size:24px}.vocab-entry .word-def{font-size:15px}.vocab-entry .doodle-svg{width:66px;height:54px}}
 </style>
 </head>
 <body>
@@ -130,7 +144,7 @@ const LV=[
 ["hsk6","HSK 6","5,000 words · advanced","六","弊端|bì duān|drawback;干预|gān yù|to intervene;渺小|miǎo xiǎo|tiny;迫不及待|pò bù jí dài|cannot wait;顽强|wán qiáng|tenacious;诚恳|chéng kěn|sincere;慷慨|kāng kǎi|generous;欣慰|xīn wèi|gratified;愧疚|kuì jiù|guilty;轻而易举|qīng ér yì jǔ|effortless;刻不容缓|kè bù róng huǎn|extremely urgent;根深蒂固|gēn shēn dì gù|deep-rooted"],
 ["hsk79","HSK 7–9","one combined advanced exam","高","阐述|chǎn shù|to elaborate;凝聚|níng jù|to rally;渗透|shèn tòu|to permeate;悖论|bèi lùn|paradox;范畴|fàn chóu|category;蕴含|yùn hán|to contain;颠覆|diān fù|to overturn;辩证|biàn zhèng|dialectical;潜移默化|qián yí mò huà|subtle influence;一丝不苟|yì sī bù gǒu|meticulous;脱颖而出|tuō yǐng ér chū|to stand out;意味深长|yì wèi shēn cháng|meaningful"]
 ].map(([id,name,sub,g,s])=>({id,name,sub,g,w:s.split(";").map(x=>{const[zh,py,en]=x.split("|");return{zh,py,en,lvl:name}})}));
-const MENU=[["tests","测试","Tests","Exams, practice tests and adaptive review"],["vocab","词汇","Vocab","Every HSK word, searchable"],["learning","学习","Learning","Path and textbooks"],["reading","阅读","Reading","A new text every day"],["flashcards","卡片","Flashcards",""],["wordlist","词表","Wordlist",""]];
+const MENU=[["tests","测试","Tests","Exams, practice tests and adaptive review"],["vocab","词汇","Vocab","Every HSK word, searchable"],["learning","学习","Learning","Path and textbooks"],["reading","阅读","Reading","A new text every day"],["flashcards","卡片","Flashcards","Flip, recall and rate each card"]];
 /* ---------- word data: loaded in full from the open-source repo, shown in our own UI ---------- */
 const DB={},PR={},FB={};
 const SRC=["https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/","https://cdn.jsdelivr.net/gh/drkameleon/complete-hsk-vocabulary@main/"];
@@ -151,6 +165,8 @@ let deck={};try{deck=JSON.parse(localStorage.getItem("hs-deck")||"{}")}catch(e){
 const save=()=>{try{localStorage.setItem("hs-deck",JSON.stringify(deck))}catch(e){}};
 const fmt=ms=>{const m=ms/MIN;if(m<1)return"<1m";if(m<60)return Math.round(m)+"m";if(m<1440)return Math.round(m/60)+"h";const d=ms/DAY;if(d<30)return Math.round(d)+"d";if(d<365)return(d/30).toFixed(1).replace(".0","")+"mo";return(d/365).toFixed(1)+"y"};
 const dueIn=(c,n=Date.now())=>c.due<=n?"now":"in "+fmt(c.due-n);
+let welcomePending=false;
+try{const last=localStorage.getItem("hs-last-visit"),nav=performance.getEntriesByType("navigation")[0];welcomePending=!!last&&((nav&&nav.type==="reload")||(Date.now()-Number(last)>15*60*1000));localStorage.setItem("hs-last-visit",String(Date.now()))}catch(e){}
 
 /* ---------- Anki-style scheduler (SM-2 variant) ---------- */
 function newCard(w){return{...w,state:"new",step:0,ease:2.5,ivl:0,due:Date.now(),lapses:0,reps:0}}
@@ -175,8 +191,9 @@ function pickCard(){const n=Date.now(),all=Object.values(deck);
 /* ---------- views ---------- */
 const page=(h,sub,body,back)=>`<div class="page">${back?`<a class="back" href="#/${back[0]}" style="--i:0">${back[1]}</a>`:""}<h1 style="--i:1">${h}</h1>${sub?`<p class="lead" style="--i:2">${sub}</p>`:""}<div class="body">${body}</div></div>`;
 const row=(h,t,d,g,i,cls="")=>`<a class="row ${cls}" href="#/${h}" style="--i:${i}"><span><b>${t}</b><small>${d}</small></span><span class="g" lang="zh">${g}</span></a>`;
-const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2]+(i>3?'<span class="tag">soon</span>':""),m[3],m[1],i+3,"big")).join(""));
-const soon=a=>{const m=MENU.find(x=>x[0]===a);return m?page(m[2],"This section is next on the list.","",["","Menu"]):home()};
+const home=()=>page("Hanzi Steps","Learn Mandarin one step at a time.",MENU.map((m,i)=>row(m[0],m[2],m[3],m[1],i+3,"big")).join(""));
+const soon=a=>{const m=MENU.find(x=>x[0]===a);return m?page(m[2],"This section is not available yet.","",["","Menu"]):home()};
+const welcomeView=()=>{const due=Object.values(deck).filter(c=>c.due<=Date.now()).length;return page("Welcome back","A little Mandarin is still a little progress.",'<div class="welcome-panel"><div class="welcome-glyph" lang="zh">欢迎回来</div><p class="lead" style="margin:0">Pick up where you left off, or make today’s next small step.</p><div class="welcome-stats"><div><b>'+due+'</b><span class="note">cards due</span></div><div><b>'+Object.keys(deck).length+'</b><span class="note">saved words</span></div></div><button class="main" data-a="welcome-go">Continue to menu</button></div>',null)};
 const testsHub=()=>{const n=Date.now(),d=Object.values(deck).filter(c=>c.due<=n).length;
  return page("Tests","Check where you stand, sit full-length exams, take longer practice sets, and drill what you keep missing.",
  qotd()+row("tests/exams","Exams","One section for each level, HSK 1 to 9","考",3)+row("tests/practice","Practice tests","Longer sets drawn from the full word lists","练",4)+row("tests/adaptive","Adaptive",d?d+" due now":"Spaced review of the words you struggle with","适",5),["","Menu"])};
@@ -184,12 +201,29 @@ const examList=()=>page("Exams","Full-length, timed exams in the HSK section lay
 const credit='<p class="note" style="margin-top:34px">Word data: Complete HSK Vocabulary (MIT licence). Definitions: CC-CEDICT (CC BY-SA 4.0).</p>';
 const loading=(h,b)=>page(h,"Loading the word list…","",b);
 const practiceList=()=>page("Practice tests","Thirty questions per set, drawn from the complete word list for each level. Missed words go straight into Adaptive.",LV.map((l,i)=>row("tests/practice/"+l.id,l.name,l.sub+" · 30 questions",l.g,i+3)).join("")+credit,["tests","Tests"]);
-const vocabHub=()=>page("Vocab","Every HSK word, searchable and ready to send to Adaptive.",row("vocab/lists","Word lists","HSK 1 to 9, loaded in full","词",3)+credit,["","Menu"]);
-const listIndex=()=>page("Word lists","Pick a level.",LV.map((l,i)=>row("vocab/list/"+l.id,l.name,l.sub,l.g,i+3)).join("")+credit,["vocab","Vocab"]);
+const vocabHub=()=>page("Vocab","Choose a level in the Wordlist sub-tab. Every HSK entry includes its definition; concrete words get a small sketch.",row("vocab/lists","Wordlist","HSK 1–9 · searchable · illustrated vocabulary","词",3)+credit,["","Menu"]);
+const listIndex=()=>page("Wordlist","Pick a level, then search the full word list.",LV.map((l,i)=>row("vocab/list/"+l.id,l.name,l.sub,l.g,i+3)).join("")+credit,["vocab","Vocab"]);
 let vq="",vn=60,vcur=[],vlv=null;
-function vlist(){const w=DB[vlv.id],q=vq.trim().toLowerCase();vcur=q?w.filter(x=>x.zh.includes(q)||x.py.toLowerCase().includes(q)||x.en.toLowerCase().includes(q)):w;
- return `<p class="note">${vcur.length} word${vcur.length===1?"":"s"}</p>`+vcur.slice(0,vn).map((x,i)=>`<div class="mini"><span class="hzs" lang="zh">${x.zh}</span><span>${x.py} · ${x.en}</span><span style="grid-column:2;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" data-a="say" data-t="${x.zh}">Listen</button><button class="ghost" data-a="addw" data-i="${i}" ${deck[x.zh]?"disabled":""}>${deck[x.zh]?"In Adaptive":"Add to Adaptive"}</button></span></div>`).join("")+(vcur.length>vn?`<button class="main alt" data-a="more" style="margin-top:20px">Show more</button>`:"")}
-function listView(lv){vlv=lv;if(!ensure(lv))return loading(lv.name,["vocab/lists","Word lists"]);
+function needsDoodle(w){const s=(w.en||"").toLowerCase().trim();if(!s)return false;return !/^(a |an |the |to |of |in |on |at |and |or |but |if |because |although |however|therefore|otherwise|unless|whereas|despite|moreover|nonetheless|consequently|even if|as if|as long as|in order to|so that|not only|rather than|whether|while|yet\b)/i.test(s)&&!/(\b)(paradox|category|concept|dialectical|morality|trend|purpose|experience|pressure|drawback|contribution|reasonable|meticulous|tenacious|sincere|generous|gratified|guilty|effortless|deep-rooted|meaningful|importance|significance|philosophy|theory|principle|abstract|otherwise|therefore|although|however|unless|whereas|despite|moreover|consequently)(\b)/i.test(s)}
+function doodle(w){if(!needsDoodle(w))return "";const s=(w.en||"").toLowerCase();let art="";
+ if(/apple|fruit|pear|peach|orange|banana|grape|lemon|watermelon/.test(s))art='<path d="M48 24 C38 13 24 24 27 40 C29 55 39 62 48 59 C57 62 68 54 70 40 C73 23 58 14 48 24Z"/><path d="M48 24 Q45 14 50 8"/><path d="M50 13 Q62 5 68 12 Q61 21 50 17"/><path d="M36 34 Q32 41 38 47"/>';
+ else if(/water|river|sea|ocean|rain|snow|ice|tear|drink|lake/.test(s))art='<path d="M48 9 C42 22 28 36 29 47 A19 19 0 0 0 67 47 C68 36 54 22 48 9Z"/><path d="M39 49 Q41 56 48 56"/><path d="M36 31 L31 38 M61 23 L66 29"/>';
+ else if(/cat|dog|animal|bird|horse|cow|sheep|pig|rabbit|fish|mouse|tiger|monkey|pet|duck|chicken/.test(s))art='<path d="M30 30 L24 14 L39 22 Q48 18 57 22 L72 14 L67 32 Q76 50 61 58 Q48 65 35 58 Q22 49 30 30Z"/><circle cx="39" cy="39" r="2"/><circle cx="58" cy="39" r="2"/><path d="M45 47 Q48 50 52 47 M48 44 L48 47"/><path d="M31 45 L20 43 M32 50 L21 52 M65 45 L76 43 M64 50 L75 52"/>';
+ else if(/teacher|student|friend|person|people|child|woman|man|mother|father|parent|family|doctor|nurse|neighbor|tour guide/.test(s))art='<circle cx="48" cy="20" r="11"/><path d="M27 61 Q28 37 48 37 Q68 37 69 61"/><path d="M36 44 L32 56 M60 44 L64 56"/><path d="M42 21 Q48 25 54 21"/>';
+ else if(/school|hospital|company|office|room|house|home|building|hotel|university|shop|store|restaurant|station|library|bank|factory/.test(s))art='<path d="M17 59 L17 30 L48 12 L79 30 L79 59Z"/><path d="M40 59 L40 43 L55 43 L55 59"/><path d="M26 35 L34 35 M26 43 L34 43 M62 35 L70 35 M62 43 L70 43"/><path d="M14 62 L82 62"/>';
+ else if(/phone|mobile|telephone|computer|television|camera|screen|radio/.test(s))art='<rect x="31" y="7" width="34" height="57" rx="5"/><path d="M39 14 L57 14 M43 56 L53 56"/><circle cx="48" cy="50" r="1.5"/>';
+ else if(/book|paper|homework|letter|newspaper|dictionary|magazine|notebook|document|write|read/.test(s))art='<path d="M14 18 Q31 12 48 22 L48 61 Q31 50 14 56Z"/><path d="M82 18 Q65 12 48 22 L48 61 Q65 50 82 56Z"/><path d="M22 28 L39 31 M22 36 L39 39 M57 31 L74 28 M57 39 L74 36"/>';
+ else if(/rice|food|meal|noodle|bread|cake|soup|coffee|tea|milk|juice|medicine|bowl|eat|cook|cup|drink/.test(s))art='<path d="M22 32 Q24 56 48 58 Q72 56 74 32Z"/><path d="M18 30 Q48 36 78 30"/><path d="M32 24 Q29 15 35 12 M46 23 Q42 11 48 8 M59 24 Q65 15 61 11"/>';
+ else if(/eye|nose|face|body|hand|foot|head|ear|mouth|tooth|hair|heart|leg|arm/.test(s))art='<circle cx="48" cy="34" r="25"/><path d="M34 31 Q39 26 43 31 M53 31 Q58 26 62 31"/><path d="M48 33 L45 42 L51 42 M39 49 Q48 56 57 49"/>';
+ else if(/car|train|bus|plane|airplane|bicycle|bike|boat|ship|taxi|subway|traffic|travel|drive/.test(s))art='<path d="M18 48 L23 33 Q25 28 32 28 L59 28 Q64 29 68 39 L77 43 L79 52 L17 52Z"/><circle cx="30" cy="53" r="7"/><circle cx="66" cy="53" r="7"/><path d="M31 29 L38 39 L62 39 L59 29"/>';
+ else if(/tree|flower|plant|forest|grass|leaf|garden|vegetable|vegetables/.test(s))art='<path d="M48 35 L48 61 M48 46 Q27 48 28 30 Q43 29 48 43 Q49 21 68 19 Q72 39 49 47"/><path d="M35 61 L61 61"/>';
+ else if(/sun|moon|star|weather|wind|cloud|sky|hot|cold|warm|cool|bright|lightning/.test(s))art='<circle cx="48" cy="34" r="15"/><path d="M48 7 L48 13 M48 55 L48 62 M21 34 L27 34 M69 34 L75 34 M29 15 L33 19 M63 49 L67 53 M67 15 L63 19 M33 49 L29 53"/>';
+ else if(/shirt|clothes|clothing|shoe|hat|dress|coat|trousers|pants|sock|bag|umbrella/.test(s))art='<path d="M34 16 L43 11 Q48 20 53 11 L63 16 L78 28 L68 38 L61 31 L61 61 L35 61 L35 31 L28 38 L18 28Z"/><path d="M43 11 Q48 17 53 11"/>';
+ else if(/clock|watch|time|today|tomorrow|yesterday|month|year|season|hour|minute|calendar|date/.test(s))art='<circle cx="48" cy="36" r="25"/><path d="M48 18 L48 36 L61 43"/><path d="M39 6 L57 6"/>';
+ else art='<path d="M22 21 L65 14 L76 49 L32 59Z"/><path d="M22 21 L39 32 L76 49 M39 32 L32 59"/><path d="M44 25 L57 23 M44 33 L62 30 M40 42 L61 38"/>';
+ return '<svg class="doodle-svg" viewBox="0 0 96 72" aria-hidden="true">'+art+'</svg>'}
+function vlist(){const w=DB[vlv.id],q=vq.trim().toLowerCase();vcur=q?w.filter(x=>x.zh.includes(q)||x.py.toLowerCase().includes(q)||(x.en||"").toLowerCase().includes(q)):w;
+ return '<p class="note">'+vcur.length+' word'+(vcur.length===1?'':'s')+'</p>'+vcur.slice(0,vn).map((x,i)=>'<article class="vocab-entry"><button class="vocab-word" data-a="dict" data-i="'+i+'" aria-label="Definition of '+esc(x.zh)+'">'+doodle(x)+'<span class="hzs" lang="zh">'+esc(x.zh)+'</span></button><div><div class="word-def">'+esc(x.en||'Definition not available')+'</div><div class="word-py">'+esc(x.py||'')+' · '+esc(x.lvl||vlv.name)+'</div></div><div class="word-actions"><button class="ghost" data-a="say" data-t="'+esc(x.zh)+'">Listen</button><button class="ghost" data-a="addw" data-i="'+i+'" '+(deck[x.zh]?'disabled':'')+'>'+(deck[x.zh]?'In Adaptive':'Add to Adaptive')+'</button></div></article>').join('')+(vcur.length>vn?'<button class="main alt" data-a="more" style="margin-top:20px">Show more</button>':'')}function listView(lv){vlv=lv;if(!ensure(lv))return loading(lv.name,["vocab/lists","Word lists"]);
  return page(lv.name,lv.sub,(FB[lv.id]?'<p class="note">Could not reach the word-list server, so this is the small built-in starter set.</p>':"")+`<input id="q" class="search" type="search" placeholder="Search hanzi, pinyin or English" autocomplete="off" aria-label="Search words"><div id="vl">${vlist()}</div>`+credit,["vocab/lists","Word lists"])}
 
 /* exams */
@@ -242,9 +276,9 @@ const PATH=[
 {id:"characters",title:"Characters and review",sub:"Recognise first, write later",g:"字",text:"Begin with recognition, not handwriting, and learn the most frequent characters first: {{about 1,000 characters cover roughly 90% of everyday text|A frequency fact repeated in beginner guides. It is why common characters come first.}}. Review them with {{spaced repetition|Hard cards return sooner and easy ones return after days or months. This is what the Adaptive tab does.}}, then read short texts in the Reading tab.",quiz:[["Which characters should you learn first?",["Rare ones","The most frequent","Only your name"],1],["What does spaced repetition do?",["Shows hard cards sooner","Hides every card","Repeats at random"],0]]}];
 const TB=[{id:"wb",title:"Chinese (Mandarin)",sub:"Wikibooks open textbook (CC BY-SA). Pronunciation, vocabulary, then 16 lessons in order.",g:"书"}];
 const SAMPLE="今天北京的天气很好。很多人去公园运动，也有人在学校附近喝茶。地铁公司说，明天会有更多的车。";
-let D=null,chat=[],qz=null,tbOpen=false,LEX=null;
-const lexAll=()=>Promise.all(LV.slice(0,6).map(getLevel)).then(()=>{if(!LEX){LEX=new Map();LV.slice(0,6).forEach(l=>DB[l.id].forEach(w=>{if(!LEX.has(w.zh))LEX.set(w.zh,w)}))}});
-function openDoc(d){D=d;if(!d.auto){d.notes=[];d.html=d.text.replace(/\{\{(.+?)\|(.+?)\}\}/g,(m,t,n)=>`<mark data-a="note" data-i="${d.notes.push({t,n})-1}">${t}</mark>`);d.plain=d.text.replace(/\{\{(.+?)\|.+?\}\}/g,"$1")}
+let D=null,chat=[],qz=null,tbOpen=false,LEX=null,assistTab="assistant";
+const lexAll=()=>Promise.all(LV.map(getLevel)).then(()=>{if(!LEX){LEX=new Map();LV.forEach(l=>(DB[l.id]||[]).forEach(w=>{if(!LEX.has(w.zh))LEX.set(w.zh,w)}))}});
+function openDoc(d){D=d;assistTab="assistant";if(!d.auto){d.notes=[];d.html=d.text.replace(/\{\{(.+?)\|(.+?)\}\}/g,(m,t,n)=>`<mark data-a="note" data-i="${d.notes.push({t,n})-1}">${t}</mark>`);d.plain=d.text.replace(/\{\{(.+?)\|.+?\}\}/g,"$1")}
  chat=[];const pool=LEX?[...LEX.values()]:[];
  qz={i:0,s:0,p:null,items:d.auto?sh([...new Set(d.hits)]).slice(0,5).map(w=>{const o=mkOpts(w,0,pool);return{q:`What does ${w.zh} (${w.py}) mean?`,o:o.map(x=>x.en),a:o.indexOf(w)}}):d.quiz.map(([q,o,a])=>({q,o,a}))}}
 const chatH=()=>chat.map(m=>`<p><b>${m.r==="user"?"You":"Tutor"}:</b> ${m.t.replace(/</g,"&lt;")}</p>`).join("")||'<p class="note">Ask anything about this text.</p>';
@@ -256,8 +290,8 @@ function lh(){const z=qz;if(!z.items.length)return'<p class="note">No highlighte
  if(z.i>=z.items.length)return`<div class="score" style="font-size:72px">${z.s}/${z.items.length}</div><div style="display:flex;gap:10px;flex-wrap:wrap">${D.auto?'<button class="main" data-a="addall">Add these words to Adaptive</button>':""}<button class="main alt" data-a="qre">Try again</button></div>`;
  const q=z.items[z.i],d=z.p!=null;
  return`<p class="ask">Question ${z.i+1} of ${z.items.length}</p><p style="font-size:20px">${q.q}</p><div class="opts">${q.o.map((o,k)=>`<button class="opt${d?(k===q.a?" ok":k===z.p?" bad":""):""}" data-a="qa" data-k="${k}" ${d?"disabled":""}>${o}</button>`).join("")}</div>${d?'<button class="main" data-a="qn">Next</button>':""}`}
-function docView(back){return page(D.title,D.sub,`<div class="reader"><div class="rtext${D.auto?" zh":""}${/^wb\//.test(D.id||"")?" wiki":""}">${D.html}</div><aside class="chat"><b>Reader assistant</b><div class="cl" id="cl">${chatH()}</div><input id="ci" class="search" placeholder="Ask about this text" autocomplete="off" aria-label="Ask the assistant"><div style="display:flex;gap:8px"><button class="ghost" data-a="send">Ask</button><button class="ghost" data-a="key">Set API key</button></div></aside></div><h2>Lesson helper</h2><div id="lh">${lh()}</div>${/^rd\//.test(D.id||"")?'<button class="link" data-a="rclose">Choose another text</button>':""}<div id="pop"></div>`,back)}
-const pop=h=>{const p=$("#pop");p.innerHTML=h+'<button class="ghost" data-a="closep">Close</button>';p.style.display="block"};
+function docView(back,extra=""){const showSource=D.source?'<a class="source-link" href="'+esc(D.source)+'" target="_blank" rel="noopener noreferrer">Open source article ↗</a>':"";return page(D.title,D.sub,'<div class="reader-topbar"><span>READING</span><div class="reader-tools">'+(extra||"")+showSource+'</div></div><div class="reader"><div class="rtext'+(D.auto?' zh':'')+(/^wb\//.test(D.id||"")?' wiki':'')+'">'+D.html+'</div><aside class="chat"><div class="assistant-tabs"><button data-a="assistTab" data-k="assistant" aria-pressed="'+(assistTab==="assistant")+'">Assistant</button><button data-a="assistTab" data-k="quiz" aria-pressed="'+(assistTab==="quiz")+'">Quiz</button></div>'+(assistTab==="assistant"?'<b>Reader assistant</b><div class="cl" id="cl">'+chatH()+'</div><input id="ci" class="search" placeholder="Ask about this text" autocomplete="off" aria-label="Ask the assistant"><div style="display:flex;gap:8px"><button class="ghost" data-a="send">Ask</button><button class="ghost" data-a="key">Set API key</button></div>':'<b>Reading quiz</b><div id="lh" class="quiz-compact" style="margin-top:10px">'+lh()+'</div>')+'</aside></div>'+(D.auto?'':'<h2>Lesson helper</h2><div id="lh">'+lh()+'</div>')+'<div id="pop"></div>',back)}
+const pop=(h,anchor)=>{const p=$("#pop");p.innerHTML=h+'<button class="ghost" data-a="closep">Close</button>';p.style.display="block";p.style.left="16px";p.style.top="16px";const r=anchor&&anchor.getBoundingClientRect?anchor.getBoundingClientRect():null,pr=p.getBoundingClientRect(),pad=12;let left=r?r.left+r.width/2-pr.width/2:innerWidth-pr.width-pad;left=Math.max(pad,Math.min(left,innerWidth-pr.width-pad));let top=r?r.top-pr.height-10:pad;if(top<pad&&r)top=Math.min(innerHeight-pr.height-pad,r.bottom+10);top=Math.max(pad,Math.min(top,innerHeight-pr.height-pad));p.style.left=left+"px";p.style.top=top+"px"};
 let pw=null;
 const learnHub=()=>page("Learning","Start with the path, then study alongside a textbook.",row("learning/path","Path","Four steps for a complete beginner","路",3)+row("learning/textbooks","Textbooks","Pick a book and study its pages","书",4),["","Menu"]);
 const pathList=()=>page("Path","Pinyin, then tones, then phrases, then characters: the order beginner guides agree on.",PATH.map((l,i)=>row("learning/path/"+l.id,l.title,l.sub+(P.done[l.id]?", done":""),l.g,i+3)).join(""),["learning","Learning"]);
@@ -278,6 +312,11 @@ function adaptive(){const n=Date.now(),all=Object.values(deck);if(!cur||!deck[cu
  (work.length?`<h2>Working on</h2>`+work.map(c=>`<div class="mini"><span class="hzs" lang="zh">${c.zh}</span><span>${c.py} · ${c.en}</span><small>${lbl[c.state]} · ease ${Math.round(c.ease*100)}%${c.lapses?" · lapses "+c.lapses:""}</small><small class="r" style="grid-column:2">${dueIn(c,n)}</small></div>`).join(""):"")+
  `<h2>Add 20 words from a level</h2><div class="seed">${LV.map(l=>`<button class="ghost" data-a="seed" data-l="${l.id}">${l.name}</button>`).join("")}</div>${all.length?`<button class="link" data-a="reset">Reset Adaptive</button>`:""}`,["tests","Tests"])}
 
+let fcCur=null,fcShown=false,fcCorrect=null,fcReviewed=new Set();
+function flashcardsView(){const all=Object.values(deck),unseen=all.filter(c=>!fcReviewed.has(c.zh)).sort((a,b)=>(a.due||0)-(b.due||0));fcCur=fcCur&&unseen.find(c=>c.zh===fcCur.zh)?fcCur:(unseen[0]||null);
+ if(!all.length)return page("Flashcards","Flip a card, check your recall, then rate its difficulty.",'<div class="card"><p class="lead" style="margin:0 auto 18px">Start with twenty words from any level. These cards also become available in Adaptive.</p><div class="seed">'+LV.map(l=>'<button class="ghost" data-a="fcSeed" data-l="'+l.id+'">'+l.name+'</button>').join('')+'</div></div>',["","Menu"]);
+ if(!fcCur)return page("Flashcards","That is the end of this session.",'<div class="card"><div class="hz" style="font-size:60px">✓</div><p class="lead" style="margin:8px auto 18px">You reviewed '+fcReviewed.size+' card'+(fcReviewed.size===1?'':'s')+'. Nice work.</p><button class="main" data-a="fcAgain">Review these again</button></div><p class="note">Your ratings update the same review schedule used in Adaptive.</p>',["","Menu"]);
+ return page("Flashcards","Flip the card before revealing your confidence controls.",'<div class="flashcard-shell"><button class="flashcard-face" data-a="fcShow" aria-label="Flip flashcard"><span class="flashcard-label">'+(fcShown?'Back of card':'Front of card')+'</span>'+(!fcShown?'<span class="hz" lang="zh">'+esc(fcCur.zh)+'</span><span class="note">Recall the sound and meaning</span>':'<span class="hz" lang="zh" style="font-size:62px">'+esc(fcCur.zh)+'</span>'+doodle(fcCur)+'<span class="py">'+esc(fcCur.py||'')+'</span><span class="en">'+esc(fcCur.en||'Definition not available')+'</span>')+'</button><p class="flashcard-meta">Card '+(fcReviewed.size+1)+' of '+all.length+'</p>'+(fcShown?(fcCorrect===null?'<div class="flashcard-feedback"><button class="ghost" data-a="fcWrong">Got it wrong</button><button class="main" data-a="fcRight">Got it right</button></div>':'<p class="note" style="text-align:center">'+(fcCorrect?'Good recall. Choose how difficult it felt.':'That is how learning works. Choose a difficulty to schedule it again.')+'</p><div class="flashcard-difficulty"><button class="ghost" data-a="fcDiff" data-r="hard">Hard</button><button class="ghost" data-a="fcDiff" data-r="okay">Okay</button><button class="ghost" data-a="fcDiff" data-r="easy">Easy</button></div>'):'<div style="text-align:center"><button class="main" data-a="fcShow">Flip card</button></div>')+'</div>',["","Menu"])}
 /* ---------- open-licence sources, loaded live and shown in our own reader ---------- */
 const WB="https://en.wikibooks.org/w/api.php",WP="https://zh.wikipedia.org/api/rest_v1/feed/featured/";
 const R={},jget=u=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json()});
@@ -295,13 +334,15 @@ function buildDoc(id,title,sub,html,concepts={}){const doc=new DOMParser().parse
  const tw=document.createTreeWalker(doc,NodeFilter.SHOW_TEXT),ns=[];while(tw.nextNode())ns.push(tw.currentNode);
  ns.forEach(nd=>{if(nd.parentNode.closest("mark"))return;const x=nd.nodeValue;let h="";
   for(let i=0;i<x.length;){let hit=false;for(const t of terms){if(x.startsWith(t,i)){h+=`<mark data-a="note" data-i="${notes.push({t,n:concepts[t]})-1}">${t}</mark>`;i+=t.length;hit=true;break}}
-   if(hit)continue;let m=null;for(let l=Math.min(4,x.length-i);l>0;l--){const w=LEX.get(x.substr(i,l));if(w){m=w;break}}
-   if(m){h+=`<mark data-a="hit" data-i="${hits.push(m)-1}">${m.zh}</mark>`;i+=m.zh.length}else h+=esc(x[i++])}
+   if(hit)continue;let m=null;for(let l=Math.min(8,x.length-i);l>0;l--){const w=LEX&&LEX.get(x.substr(i,l));if(w){m=w;break}}
+   if(m){h+=`<mark data-a="hit" data-i="${hits.push(m)-1}">${m.zh}</mark>`;i+=m.zh.length}
+   else if(/[一-鿿]/.test(x[i])){const zh=x[i++],fallback={zh,py:"",en:"This character is not in the loaded HSK word lists. Ask the reader assistant for its meaning.",lvl:"Dictionary lookup"};h+=`<mark data-a="hit" data-i="${hits.push(fallback)-1}">${zh}</mark>`}
+   else h+=esc(x[i++])}
   const tp=document.createElement("template");tp.innerHTML=h;nd.replaceWith(tp.content)});
  return{id,title,sub,auto:true,hits,notes,html:doc.innerHTML,plain:doc.textContent.replace(/\s+/g," ").slice(0,1500)}}
 const wbc='<p class="note" style="margin-top:30px">Text: Wikibooks, “Chinese (Mandarin)”, licensed CC BY-SA. Pages load live and are highlighted by this app.</p>';
 const tbPicker=()=>page("Textbooks","Choose a book. Its pages open here, highlighted with HSK vocabulary and key terms, and your place is saved.",`<button class="main" data-a="tbm" aria-expanded="${tbOpen}">Choose your textbook ${tbOpen?"▴":"▾"}</button>`+(tbOpen?`<div style="margin-top:14px">${TB.map((t,i)=>row("learning/textbooks/"+t.id,t.title,t.sub,t.g,i)).join("")}</div>`:"")+(P.tb.last?`<div style="margin-top:22px">${row("learning/textbooks/"+P.tb.last,"Continue where you left off",P.tb.lastT||"","续",1)}</div>`:"")+wbc,["learning","Learning"]);
-async function tocWB(){const SKIP=/Planning|Contributors|How To Use|Print|Template|Talk|Cover|Special:|Category:|Traditional/i,seen=new Set(),t=[],P0="Chinese (Mandarin)/";
+async function tocWB(){const SKIP=/Planning|Contributors|How To Use|Print|Template|Talk|Cover|Special:|Category:|Traditional|Mac OS|Linux|Windows|iOS|Android|keyboard setup|language setup|input method|typing Chinese|install|download|software|system requirements|troubleshoot|external links|further reading|bibliography|appendix|copyright|authors|reference desk/i,seen=new Set(),t=[],P0="Chinese (Mandarin)/";
  const add=(ti,label)=>{if(ti.startsWith(P0)&&!seen.has(ti)&&!SKIP.test(ti)){seen.add(ti);t.push({title:ti,label:label||ti.slice(P0.length)})}};
  try{const j=await jget(WB+"?action=parse&page="+encodeURIComponent("Chinese (Mandarin)")+"&prop=text&redirects=1&disableeditsection=1&format=json&origin=*");
   new DOMParser().parseFromString(j.parse.text["*"],"text/html").querySelectorAll("a[href]").forEach(a=>{let h=a.getAttribute("href");if(!h.startsWith("/wiki/"))return;try{h=decodeURIComponent(h.slice(6).split("#")[0]).replace(/_/g," ")}catch(e){return}add(h,a.textContent.trim())})}catch(e){}
@@ -312,12 +353,13 @@ async function tocWB(){const SKIP=/Planning|Contributors|How To Use|Print|Templa
 const tbBack=["learning/textbooks","Textbooks"];
 function wbToc(){const t=need("wbtoc",tocWB);if(!t)return page("Chinese (Mandarin)",failed("wbtoc")?"Could not reach Wikibooks. Check your connection and reload.":"Loading the table of contents…","",tbBack);
  return page("Chinese (Mandarin)","Pronunciation and vocabulary first, then the lessons in order. Progress is saved.",(P.tb.last?row("learning/textbooks/"+P.tb.last,"Continue",P.tb.lastT||"","续",2):"")+t.map((x,i)=>row("learning/textbooks/wb/"+i,x.label,P.done["wb/"+i]?"Quiz completed":"","文",i+3)).join("")+wbc,tbBack)}
-function wbPage(i){const back=["learning/textbooks/wb","Contents"],t=need("wbtoc",tocWB);if(!t)return page("Chinese (Mandarin)",failed("wbtoc")?"Could not reach Wikibooks.":"Loading…","",back);
+function wbPage(i){const back=["learning/textbooks/wb","Contents"],t=need("wbtoc",tocWB);if(!t)return page("Chinese (Mandarin)",failed("wbtoc")?"Could not load the textbook.":"Loading…","",back);
  const it=t[i];if(!it)return learnHub();
- const r=need("wbp"+i,()=>lexAll().then(()=>jget(WB+"?action=parse&page="+encodeURIComponent(it.title)+"&prop=text&redirects=1&disableeditsection=1&disabletoc=1&format=json&origin=*")).then(j=>buildDoc("wb/"+i,it.label,"Wikibooks, CC BY-SA. Underlined: HSK words and the book's bold key terms.",j.parse.text["*"])));
+ const r=need("wbp"+i,()=>lexAll().then(()=>jget(WB+"?action=parse&page="+encodeURIComponent(it.title)+"&prop=text&redirects=1&disableeditsection=1&disabletoc=1&format=json&origin=*")).then(j=>buildDoc("wb/"+i,it.label,"Wikibooks, CC BY-SA. Key terms and HSK vocabulary are clickable.",j.parse.text["*"])));
  if(!r)return page(it.label,failed("wbp"+i)?"Could not load this page.":"Loading the page…","",back);
  if(D!==r){openDoc(r);P.tb.last="wb/"+i;P.tb.lastT=it.label;savep()}
- return docView(back)+`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">${i>0?`<a class="main alt" style="display:inline-block;text-decoration:none" href="#/learning/textbooks/wb/${i-1}">Previous page</a>`:""}${i<t.length-1?`<a class="main" style="display:inline-block;text-decoration:none" href="#/learning/textbooks/wb/${i+1}">Next page</a>`:""}</div>`}
+ const picker='<label class="chapter-nav">Chapter <select id="chapterPicker" aria-label="Jump to chapter">'+t.map((x,k)=>'<option value="'+k+'" '+(k===i?'selected':'')+'>'+esc(x.label)+'</option>').join('')+'</select></label>';
+ return docView(back,picker)+'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">'+(i>0?'<a class="main alt" style="display:inline-block;text-decoration:none" href="#/learning/textbooks/wb/'+(i-1)+'">Previous chapter</a>':"")+(i<t.length-1?'<a class="main" style="display:inline-block;text-decoration:none" href="#/learning/textbooks/wb/'+(i+1)+'">Next chapter</a>':"")+'</div>'}
 /* reading: a fresh set of texts every day from Chinese Wikipedia's daily feed */
 const rdTabs=[["news","News"],["tfa","Article of the day"],["otd","On this day"],["own","Your own text"]];
 let rdTab="news",rdItems=[];
@@ -326,9 +368,9 @@ const feed=()=>jget(WP+fday(0)).catch(()=>jget(WP+fday(1)));
 const txt=h=>new DOMParser().parseFromString(h,"text/html").body.textContent.replace(/\s+/g," ").trim();
 const cmap=ls=>Object.fromEntries((ls||[]).filter(l=>(l.normalizedtitle||l.title)&&l.extract).map(l=>[(l.normalizedtitle||l.title).replace(/_/g," "),l.extract.slice(0,200)]));
 function rditems(f,tab){
- if(tab==="news")return(f.news||[]).map((n,i)=>({k:"news"+i,title:txt(n.story).slice(0,30),body:txt(n.story),c:cmap(n.links)}));
- if(tab==="tfa")return f.tfa?[{k:"tfa",title:(f.tfa.titles&&f.tfa.titles.normalized)||f.tfa.title,body:f.tfa.extract||"",c:{}}]:[];
- return(f.onthisday||[]).slice(0,12).map((o,i)=>({k:"otd"+i,title:o.year+"年",body:o.year+"年，"+o.text,c:cmap(o.pages)}))}
+ if(tab==="news")return(f.news||[]).map((n,i)=>{const p=(n.links||[])[0],title=(p&&(p.normalizedtitle||p.title))||txt(n.story).slice(0,36);return{k:"news"+i,title,body:txt(n.story),c:cmap(n.links),url:p?"https://zh.wikipedia.org/wiki/"+encodeURIComponent((p.normalizedtitle||p.title).replace(/ /g,"_")):""}});
+ if(tab==="tfa"){const x=f.tfa;if(!x)return[];const title=(x.titles&&x.titles.normalized)||x.title;return[{k:"tfa",title,body:x.extract||"",c:{},url:(x.content_urls&&x.content_urls.desktop&&x.content_urls.desktop.page)||"https://zh.wikipedia.org/wiki/"+encodeURIComponent((x.titles&&x.titles.canonical)||title)}]}
+ return(f.onthisday||[]).slice(0,12).map((o,i)=>{const p=(o.pages||[])[0],title=(p&&(p.normalizedtitle||p.title))||o.year+"年";return{k:"otd"+i,title,body:o.year+"年，"+o.text,c:cmap(o.pages),url:p?"https://zh.wikipedia.org/wiki/"+encodeURIComponent((p.normalizedtitle||p.title).replace(/ /g,"_")):""}})}
 function readingView(){if(D)return docView(null);
  const tabs=`<div class="chips">${rdTabs.map(t=>`<button class="ghost" data-a="rtab" data-k="${t[0]}" aria-pressed="${t[0]===rdTab}">${t[1]}</button>`).join("")}</div>`;let body;
  if(rdTab==="own")body=`<textarea id="rt" class="search" rows="7" style="border-radius:22px;resize:vertical" lang="zh" placeholder="Paste Chinese text here"></textarea><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="main" data-a="rgo">Study this text</button><button class="main alt" data-a="rsample">Use a sample passage</button></div>`;
@@ -373,7 +415,9 @@ function route(){const[a,b,c,d]=location.hash.replace(/^#\/?/,"").split("/").fil
  else if(a==="learning"&&b==="textbooks"&&c==="wb"&&!d)view=wbToc;
  else if(a==="learning"&&b==="textbooks"&&c==="wb")view=()=>wbPage(+d);
  else if(a==="reading")view=readingView;
+ else if(a==="flashcards"&&!b)view=flashcardsView;
  else view=()=>soon(a);
+ if(welcomePending)view=welcomeView;
  scrollTo(0,0);draw(true)}
 app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
  if(a==="say")speak(b.dataset.t);
@@ -382,6 +426,13 @@ app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)retu
  else if(a==="retry"){startExam(ex.lv,ex.kind);draw(true)}
  else if(a==="go")location.hash="#/"+b.dataset.h;
  else if(a==="show"){shown=true;speak(cur.zh);draw(false)}
+ else if(a==="fcShow"){if(!fcShown){fcShown=true;draw(false)}}
+ else if(a==="fcRight"){fcCorrect=true;draw(false)}
+ else if(a==="fcWrong"){fcCorrect=false;draw(false)}
+ else if(a==="fcDiff"){if(fcCur){const rating=!fcCorrect?1:(b.dataset.r==="easy"?4:b.dataset.r==="okay"?3:2);deck[fcCur.zh]=sched(fcCur,rating);save();fcReviewed.add(fcCur.zh)}fcCur=null;fcShown=false;fcCorrect=null;draw(false)}
+ else if(a==="fcAgain"){fcReviewed.clear();fcCur=null;fcShown=false;fcCorrect=null;draw(false)}
+ else if(a==="fcSeed"){const lv=LV.find(l=>l.id===b.dataset.l);if(lv)getLevel(lv).then(w=>{shuf(w.filter(x=>!deck[x.zh])).slice(0,20).forEach(x=>deck[x.zh]=newCard(x));save();fcReviewed.clear();fcCur=null;fcShown=false;fcCorrect=null;if(location.hash!=="#/flashcards")location.hash="#/flashcards";draw(false)})}
+ else if(a==="welcome-go"){welcomePending=false;location.hash="#/";route()}
  else if(a==="rate"){deck[cur.zh]=sched(cur,+b.dataset.r);save();cur=null;shown=false;draw(false)}
  else if(a==="seed"){const lv=LV.find(l=>l.id===b.dataset.l);b.textContent="Adding…";getLevel(lv).then(w=>{shuf(w.filter(x=>!deck[x.zh])).slice(0,20).forEach(x=>deck[x.zh]=newCard(x));save();if(location.hash==="#/tests/adaptive")draw(false)})}
  else if(a==="shufall"){bump();draw(false)}
@@ -392,8 +443,10 @@ app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)retu
  else if(a==="fnext"){fe.qi++;draw(false);fsay()}
  else if(a==="ffin"){if(confirm("Finish this section? You cannot return to it."))finishSec()}
  else if(a==="tbm"){tbOpen=!tbOpen;draw(false)}
- else if(a==="note")pop(`<b>${D.notes[+b.dataset.i].t}</b><p>${D.notes[+b.dataset.i].n}</p>`)
- else if(a==="hit"){pw=D.hits[+b.dataset.i];pop(`<b lang="zh" style="font:700 26px var(--hz)">${pw.zh}</b><p>${pw.py}<br>${pw.en}</p><button class="ghost" data-a="say" data-t="${pw.zh}">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button> `)}
+ else if(a==="assistTab"){assistTab=b.dataset.k==="quiz"?"quiz":"assistant";draw(false)}
+ else if(a==="note"){const n=D.notes[+b.dataset.i];if(n)pop("<b>"+esc(n.t)+"</b><p>"+esc(n.n)+"</p>",b)}
+ else if(a==="hit"){pw=D.hits[+b.dataset.i];if(pw)pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(pw.zh)+'</b><p>'+esc(pw.py||"")+(pw.py?'<br>':"")+esc(pw.en||"Definition not available")+'</p><button class="ghost" data-a="say" data-t="'+esc(pw.zh)+'">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button>',b)}
+ else if(a==="dict"){const w=vcur[+b.dataset.i];if(w){pw=w;pop('<b lang="zh" style="font:700 26px var(--hz)">'+esc(w.zh)+'</b><p>'+esc(w.py||"")+(w.py?'<br>':"")+esc(w.en||"Definition not available")+'</p><button class="ghost" data-a="say" data-t="'+esc(w.zh)+'">Listen</button> <button class="ghost" data-a="addp">Add to Adaptive</button>',b)}}
  else if(a==="addp"){if(pw&&!deck[pw.zh]){deck[pw.zh]=newCard(pw);save()}b.textContent="Added";b.disabled=true}
  else if(a==="closep")$("#pop").style.display="none"
  else if(a==="send"){const i=$("#ci"),v=i.value.trim();if(!v)return;chat.push({r:"user",t:v});i.value="";$("#cl").innerHTML=chatH();ask().then(t=>{chat.push({r:"assistant",t});$("#cl").innerHTML=chatH()})}
@@ -404,7 +457,7 @@ app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)retu
  else if(a==="qprev"){qm--;draw(false)}
  else if(a==="qnext"){qm++;draw(false)}
  else if(a==="rtab"){rdTab=b.dataset.k;draw(false)}
- else if(a==="ropen"){const it=rdItems[+b.dataset.i];lexAll().then(()=>{openDoc(buildDoc("rd/"+it.k+dkey(),it.title,"Chinese Wikipedia (CC BY-SA), "+dkey()+". Underlined: key concepts and HSK words.",esc(it.body),it.c));draw(true)})}
+ else if(a==="ropen"){const it=rdItems[+b.dataset.i];lexAll().then(()=>{const d=buildDoc("rd/"+it.k+dkey(),it.title,"Chinese Wikipedia (CC BY-SA), "+dkey()+". Tap vocabulary for definitions and use the Quiz tab to check comprehension.",esc(it.body),it.c);d.source=it.url||"";openDoc(d);draw(true)})}
  else if(a==="qre"){qz.i=0;qz.s=0;qz.p=null;$("#lh").innerHTML=lh()}
  else if(a==="addall"){D.hits.forEach(w=>{if(!deck[w.zh])deck[w.zh]=newCard(w)});save();b.textContent="Added"}
  else if(a==="rsample")$("#rt").value=SAMPLE
@@ -413,6 +466,7 @@ app.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)retu
  else if(a==="more"){vn+=60;$("#vl").innerHTML=vlist()}
  else if(a==="addw"){const x=vcur[+b.dataset.i];if(x&&!deck[x.zh]){deck[x.zh]=newCard(x);save()}$("#vl").innerHTML=vlist()}
  else if(a==="reset"&&confirm("Clear everything in Adaptive?")){deck={};save();cur=null;shown=false;draw(false)}});
+app.addEventListener("change",e=>{if(e.target&&e.target.id==="chapterPicker"){const v=e.target.value;if(/^\\d+$/.test(v))location.hash="#/learning/textbooks/wb/"+v}});
 addEventListener("hashchange",route);
 setInterval(()=>{if(fe&&fe.on&&!fe.done){const l=fe.end-Date.now();if(l<=0)finishSec();else{const e=$("#tm");if(e)e.textContent=clock(l)}}},1000);
 app.addEventListener("input",e=>{if(e.target.id==="wa")fe.secs[fe.si].items[fe.qi].ans=e.target.value;if(e.target.id==="q"){vq=e.target.value;vn=60;$("#vl").innerHTML=vlist()}});
